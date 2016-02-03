@@ -5,15 +5,17 @@
 	</head>
 <h1>Compiler: The most vanilla compiler...ever</h1>
 	<body>
-		<div>
-			<textarea>
-			</textarea>
-				<button 
-					onclick="logOne()">Lexer
-				</button>
-				<button 
-					onclick="logTwo()">parser
-				</button>
+
+		<div style="width: 100%; display: table;">
+			<div style="display: table-row">
+				<div style="width: 600px; display: table-cell;">
+					<textarea style="width:500px;height:400px" id="inputTxt"></textarea>
+				</div>
+				<div style="display: table-cell;", id="grammarTbl">
+					<img src="images/grammarTable.png" style="width: 600px;height:500px">
+				</div>
+			</div>
 		</div>
+		<button onclick="logOne();">Compile</button>
 	</body>
 <html>
