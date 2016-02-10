@@ -1,21 +1,171 @@
+<!DOCTYPE HTML>
 <html>
-	<head>
-		<script src="lexer.js"></script>
-		<script src="parser.js"></script>
-	</head>
-<h1>Compiler: The most vanilla compiler...ever</h1>
-	<body>
+<head>
+    <title>My Compiler</title>
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+    <!--<link rel="stylesheet" type="text/css" href="compiler.css" />-->
+	<link href="bootstrap.css" rel="stylesheet"><!--The magic happens here-->
+</head>
+<body onload="init();">
 
-		<div style="width: 100%; display: table;">
-			<div style="display: table-row">
-				<div style="width: 600px; display: table-cell;">
-					<textarea style="width:500px;height:400px" id="inputTxt"></textarea>
-				</div>
-				<div style="display: table-cell;", id="grammarTbl">
-					<img src="images/grammarTable.png" style="width: 600px;height:500px">
-				</div>
-			</div>
-		</div>
-		<button onclick="logOne();">Compile</button>
-	</body>
-<html>
+    <h1><img src="img/test/new2.gif">Richard Liao's Compiler Project: The most 90's Compiler yet<img src="img/test/new2.gif"></h1>
+	<div>
+		<img src="img/flames.gif" style="background-repeat: repeat-y;width:100%;height:50px">
+	</div>
+	<p>
+		<em>"Oh god my eyes." -Anonymous</em>
+    </p>
+	<p>
+		<em>"What the hell is this." -Alan Labouseur</em>
+    </p>
+	<p>
+		<em>"I'm not changing it." -Richard Liao</em>
+    </p>
+    <div style="float:left">
+        <textarea id="taSourceCode" cols="32" rows="18"></textarea>
+        <br>
+        <button id="btnCompile" onclick="btnCompile_click();"><img src="img/test/hot.gif">Compile</button>
+    </div>
+	<div>
+		<textarea id="taOutput" cols="32" rows="18"></textarea>
+	</div>
+    <!-- Footer -->
+	<br>
+	<br>
+	<p>
+		<address>
+			<strong>Lost your eye sight? Want to complain?</strong>
+			<br>
+			<a href="">
+				<img src="img/test/emailme.gif" alt="Valid HTML5" width="88" height="31" />
+				Richard.liao1@marist.edu
+			</a>
+		</address>
+		<strong>Good luck reading the email address!</strong>
+    </p>
+	<br>
+	<center>
+	    <p class="pull-left" style="margin-top: -14px"><img src="img/test/geocities.jpg"><img src="img/test/counter2.gif"></p>
+		<img src="img/test/mchammer.gif"><img src="img/test/mchammer.gif"><img src="img/test/mchammer.gif">
+	</center>
+    <!-- Client-side code down here, per the YSlow advice. 
+    // (http://developer.yahoo.com/performance/rules.html#js_bottom) -->
+    <script type="text/javascript" src="scripts/utils.js"></script>	
+    <script type="text/javascript" src="scripts/lexer.js"></script>	
+    <script type="text/javascript">
+    // Global variables
+    var tokens = "";
+    var tokenIndex = 0;
+    var currentToken = "";
+    var errorCount = 0;
+    var EOF = "$";
+
+    function init() {
+        // Clear the message box.
+        document.getElementById("taOutput").value = "";
+        // Set the initial values for our globals.
+        tokens = "";
+        tokenIndex = 0;
+        currentToken = ' ';
+        errorCount = 0;        
+    }
+    
+    function btnCompile_click() {        
+        // This is executed as a result of the usr pressing the 
+        // "compile" button between the two text areas, above.  
+        // Note the <input> element's event handler: onclick="btnCompile_click();
+        init();
+        putMessage("Compilation Started");
+        // Grab the tokens from the lexer . . .
+        tokens = lex();
+        putMessage("Lex returned [" + tokens + "]");
+        // . . . and parse!
+        parse();
+    }
+    
+    function putMessage(msg) {
+        document.getElementById("taOutput").value += msg + "\n";
+    }
+    
+    
+    function parse() {
+        putMessage("Parsing [" + tokens + "]");
+        // Grab the next token.
+        currentToken = getNextToken();
+        // A valid parse derives the G(oal) production, so begin there.
+        parseG();
+        // Report the results.
+        putMessage("Parsing found " + errorCount + " error(s).");        
+    }
+    
+    function parseG() {
+        // A G(oal) production can only be an E(xpression), so parse the E production.
+        parseE();
+    }
+
+    function parseE() {
+        // All E productions begin with a digit, so make sure that we have one.
+        checkToken("digit");
+        // Look ahead 1 char (which is now in currentToken because checkToken 
+        // consumes another one) and see which E production to follow.
+        if (currentToken != EOF) {
+            // We're not done, we we expect to have an op.
+            checkToken("op");
+            parseE();
+        } else {
+            // There is nothing else in the token stream, 
+            // and that's cool since E --> digit is valid.
+            putMessage("EOF reached");
+        }
+    }
+
+    function checkToken(expectedKind) {
+        // Validate that we have the expected token kind and et the next token.
+        switch(expectedKind) {
+            case "digit":   putMessage("Expecting a digit");
+                            if (currentToken=="0" || currentToken=="1" || currentToken=="2" || 
+                                currentToken=="3" || currentToken=="4" || currentToken=="5" || 
+                                currentToken=="6" || currentToken=="7" || currentToken=="8" || 
+                                currentToken=="9")
+                            {
+                                putMessage("Got a digit!");
+                            }
+                            else
+                            {
+                                errorCount++;
+                                putMessage("NOT a digit.  Error at position " + tokenIndex + ".");
+                            }
+                            break;
+            case "op":      putMessage("Expecting an operator");
+                            if (currentToken=="+" || currentToken=="-")
+                            {
+                                putMessage("Got an operator!");
+                            }
+                            else
+                            {
+                                errorCount++;
+                                putMessage("NOT an operator.  Error at position " + tokenIndex + ".");
+                            }
+                            break;
+            default:        putMessage("Parse Error: Invalid Token Type at position " + tokenIndex + ".");
+                            break;			
+        }
+        // Consume another token, having just checked this one, because that 
+        // will allow the code to see what's coming next... a sort of "look-ahead".
+        currentToken = getNextToken();
+    }
+
+    function getNextToken() {
+        var thisToken = EOF;    // Let's assume that we're at the EOF.
+        if (tokenIndex < tokens.length)
+        {
+            // If we're not at EOF, then return the next token in the stream and advance the index.
+            thisToken = tokens[tokenIndex];
+            putMessage("Current token:" + thisToken);
+            tokenIndex++;
+        }
+        return thisToken;
+    }
+    </script>
+</body>
+</html>
