@@ -56,9 +56,8 @@
 @TODO: 
 deny continous word ex:yay!
 deny multiple digits
-fix assignment vs equality
 token line #
-what happens after token is found/created?
+what happens after token is found/found?
 */
 	var delta =[
 		//		| 0 | 1	| 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10| 11| 12| 13| 14| 15| 16| 17| 18| 19| 20| 21| 22| 23| 24| 25| 26| 27| 28| 29| 30| 31| 32| 33| 34| 35| 36| 37| 38| 39| 40| 41| 42| 43| 44| 45   |
@@ -102,7 +101,6 @@ what happens after token is found/created?
 /*@!=     q36*/	[49 ,49 ,49 ,49 ,49 ,49 ,49 ,49 ,49 ,49 ,49 ,49 ,49 ,49 ,49 ,49 ,49 ,49 ,49 ,49 ,49 ,49 ,49 ,49 ,49 ,49 ,49 ,49 ,49 ,49 ,49 ,49 ,49 ,49 ,49 ,49 ,49 ,49 ,49 ,49 ,49 ,49 ,49 ,49 , 49, 36 	],
 /*==  @=  q37*/	[49 ,49 ,49 ,49 ,49 ,49 ,49 ,49 ,49 ,49 ,49 ,49 ,49 ,49 ,49 ,49 ,49 ,49 ,49 ,49 ,49 ,49 ,49 ,49 ,49 ,49 ,49 ,49 ,49 ,49 ,49 ,49 ,49 ,49 ,49 ,49 ,38 ,49 ,49 ,49 ,49 ,49 ,49 ,49 , 49, 49	],
 /*@==     q38*/	[49 ,49 ,49 ,49 ,49 ,49 ,49 ,49 ,49 ,49 ,49 ,49 ,49 ,49 ,49 ,49 ,49 ,49 ,49 ,49 ,49 ,49 ,49 ,49 ,49 ,49 ,49 ,49 ,49 ,49 ,49 ,49 ,49 ,49 ,49 ,49 ,49 ,49 ,49 ,49 ,49 ,49 ,49 ,49 , 49, 38	],
-// /*@=      q39*/	[ 	], REMOVED THIS LINE. 39 IS NO LONGER ACCEPTING STATE FOR =
 /*ChrList q39*/	[40 ,40 ,40 ,40 ,40 ,40 ,40 ,40 ,40 ,40 ,40 ,40 ,40 ,40 ,40 ,40 ,40 ,40 ,40 ,40 ,40 ,40 ,40 ,40 ,40 ,40 ,40 ,40 ,40 ,40 ,40 ,40 ,40 ,40 ,40 ,40 ,40 ,40 ,40 ,40 ,40 ,40 ,40 ,40 , 49, 40 	],
 		/*q40*/	[39 ,39 ,39 ,39 ,39 ,39 ,39 ,39 ,39 ,39 ,39 ,39 ,39 ,39 ,39 ,39 ,39 ,39 ,39 ,39 ,39 ,39 ,39 ,39 ,39 ,39 ,39 ,39 ,39 ,39 ,39 ,39 ,39 ,39 ,39 ,39 ,39 ,39 ,39 ,39 ,39 ,39 ,39 ,41 , 49, 39 	],
 /*@ChrListq41*/	[49 ,49 ,49 ,49 ,49 ,49 ,49 ,49 ,49 ,49 ,49 ,49 ,49 ,49 ,49 ,49 ,49 ,49 ,49 ,49 ,49 ,49 ,49 ,49 ,49 ,49 ,49 ,49 ,49 ,49 ,49 ,49 ,49 ,49 ,49 ,49 ,49 ,49 ,49 ,49 ,49 ,49 ,49 ,49 , 49, 41 	],
@@ -155,101 +153,114 @@ what happens after token is found/created?
 				//find next state in matrix.
 				state=delta[state][c];
 				console.log("moving to state: "+state);
-				checkState();
+				checkState(str,i);
 			}catch(err) {
-				//on err, go to state 50, error state
-				state=50;
+				//on err, go to state 49, error state
+				state=49;
 			}
 		}
 	}
 	//Checks the current state for an accept state.
 	//If so, creates the appropriate token and resets the state
-	function checkState(){
+	function checkState(string,pos){
+		var input=string;
+		var i=pos;
 		console.log("checking state: "+state);
 		switch(state) {
 			case 5:
 				resetState();
-				console.log('Token Created: Print');
+				console.log('Token found: Print');
 				//create Print Token
 				break;
 			case 10:
 				resetState();
-				console.log('Token Created: While');
+				console.log('Token found: While');
 				//create While Token
 				break;
 			case 12:
 				resetState();
-				console.log('Token Created: If');
+				console.log('Token found: If');
 				//create if Token
 				break;
 			case 14:
 				resetState();
-				console.log('Token Created: Type');
+				console.log('Token found: Type');
 				//create Type Token
 				break;
  			case 15:
 				//FIXME
-				console.log('Token Created: Identifier');
+				console.log('Token found: Identifier');
 				//create id Token
 				break; 
 			case 34:
 				resetState();
-				console.log('Token Created: Boolean Value');
+				console.log('Token found: Boolean Value');
 				//create BoolVal Token
 				break;
 			case 36:
 				resetState();
-				console.log('Token Created: Inequality');
+				console.log('Token found: Inequality');
 				//create inequality Token
 				break;
+			case 37:
+				//Need to check for this case because == has same initial input as =
+				if(input.charAt(i+1)=='='){
+					return;
+				}else{
+					resetState();
+					console.log('Token found: Assignment');
+					//create Assignment Token
+				}
+				break;
 			case 38:
+			console.log('HEY 38.');
 				resetState();
-				console.log('Token Created: Equality');
+				console.log('Token found: Equality');
 				//create equality Token
 				break;
 			case 41:
 				resetState();
-				console.log('Token Created: String');
+				console.log('Token found: String');
 				//create String Token
 				break;
 			case 42:
 				//FIXME
-				console.log('Token Created: Digit');
+				console.log('Token found: Digit');
 				//create digit Token
 				break;
 			case 43:
 				resetState();
-				console.log('Token Created: Integer Operator');
+				console.log('Token found: Integer Operator');
 				//create Integer Operator Token
 				break;
-			case 45:
+			case 44:
 				resetState();
-				console.log('Token Created: Left Bracket');
+				console.log('Token found: Left Bracket');
 				//create Left Bracket Token
 				break;
 			case 45:
 				resetState();
-				console.log('Token Created: Right Bracket');
+				console.log('Token found: Right Bracket');
 				//create Right Bracket Token
 				break;
 			case 46:
 				resetState();
-				console.log('Token Created: Left Parenthesis');
+				console.log('Token found: Left Parenthesis');
 				//create Left Parenthesis Token
 				break;
 			case 47:
 				resetState();
-				console.log('Token Created: Right Parenthesis');
+				console.log('Token found: Right Parenthesis');
 				//create right Parenthesis Token
 				break;
 			case 48:
 				resetState();
-				console.log('Token Created: EOF');
+				console.log('Token found: EOF');
 				//create EOF Token
 				break;
 			case 49:
 				resetState();
-				console.log('Token Created: Error');
+				console.log('Token found: Error');
 				//create Error Token
 				break;
 			default:
