@@ -63,6 +63,7 @@ DONE   deny multiple digits
 	   Check for even num of quotes 
 	   HANDLE WHATEVER IS IN BETWEEN QUOTES OHGODHOW
 	   Error handling.
+	   Replace console.logs() with real messages
 DONE   newLineChar
 */
 	var delta =[
@@ -145,6 +146,10 @@ DONE   newLineChar
         //remove \n too.
 		//sourceCode = sourceCode.replace(/(\r\n|\n|\r)/gm,"");
 		console.log('Lexing String: '+sourceCode);
+		if(sourceCode.charAt(sourceCode.length)!='$'){
+			console.log('Warning No EOF character($) found...');
+			sourceCode=sourceCode+'$';
+		}
 		//remove all spaces in the middle;
 		//sourceCode = sourceCode.replace(/\s/g,'');
 		process(sourceCode);
@@ -158,17 +163,23 @@ DONE   newLineChar
 		for(i=0;i<str.length;i++){
 			//c is the character at i, mapped to the map
 			c=get(str.charAt(i));
-			console.log("got char "+str.charAt(i)+": "+c);
-			try {
-				//find next state in matrix.
-				state=delta[state][c];
-				//console.log("moving to state: "+state);
-				//pass string and current position to checkState to check next char in input
-				checkState(str,i);
-			}catch(err) {
-				//on err, go to state 51, error state
-				state=51;
-			}//eo try catch
+			//Check for inputs not in the alphabet
+			if(!isNaN(c)){
+				console.log("got char "+str.charAt(i)+": "+c);
+				try {
+					//find next state in matrix.
+					state=delta[state][c];
+					//console.log("moving to state: "+state);
+					//pass string and current position to checkState to check next char in input
+					checkState(str,i);
+				}catch(err) {
+					//on err, go to state 51, error state
+					state=51;
+				}//eo try catch
+			}else{
+				console.log("Invalid input: "+str.charAt(i));
+				return;
+			}//eo if
 		}//eo for
 	}//eo process
 	//Checks the current state for an accept state.
@@ -316,14 +327,16 @@ DONE   newLineChar
 				break;
 			case 44:
 			//check for more than 1 digit. If so, self destruct computer
-				if(!isNaN(parseInt(lookAhead(input,i,1)))){
+				/* if(!isNaN(parseInt(lookAhead(input,i,1)))){
 					console.log("ANOTHER DIGIT! BURN THE WITCH!");
 					return;
 				}else{
 					resetState();
 					console.log('Token found: Digit');
 					//create digit Token
-				}
+				} */
+				resetState();
+				console.log('Token found: Digit');
 				break;
 			case 45:
 				resetState();
@@ -362,23 +375,10 @@ DONE   newLineChar
 			default:
 				if(lookAhead(input,i,1)==""){
 					console.log('ERROR ERROR ERROR');
+					//create error token
 					state =51;
 					return;
 				}
 				break;
 		}//eo switch
 	}//eo checkState
-	//simple function that returns a substring. Intended for looking ahead for context.
-	function lookAhead(str, start, num){
-		var input = str;
-		var x=start+1;
-		var y=num;
-		var out=input.substr(x,y);
-		//console.log("lookAhead: "+out)
-		return out;
-	}//eo lookAhead
-	//simple function to check if a string(char) is only letters
-	function isLetter(str) {
-		//console.log("letter???: "+str)
-		return /^[a-z]+$/.test(str);
-	}//eo lookAhead

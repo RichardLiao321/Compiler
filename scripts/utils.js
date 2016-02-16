@@ -42,3 +42,17 @@ function rot13(str)     // An easy-to understand implementation of the famous an
     }
     return retVal;
 }
+//simple function that returns a substring. Intended for looking ahead for context.
+function lookAhead(str, start, num){
+	var input = str;
+	var x=start+1;
+	var y=num;
+	var out=input.substr(x,y);
+	//console.log("lookAhead: "+out)
+	return out;
+}//eo lookAhead
+//simple function to check if a string(char) is only letters
+function isLetter(str) {
+	//console.log("letter???: "+str)
+	return /^[a-z]+$/.test(str);
+}//eo lookAhead
