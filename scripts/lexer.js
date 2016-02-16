@@ -179,7 +179,7 @@ DONE   newLineChar
 		console.log("checking state: "+state);
 		switch(state) {
 			case 1://receive just "p"
-				if(lookAhead(input,i,1)=='' || lookAhead(input,i,1)==' '|| lookAhead(input,i,1)=='\n'|| isLetter(lookAhead(input,i,1))==true){
+				if(lookAhead(input,i,1)=='' || lookAhead(input,i,1)==' '|| lookAhead(input,i,1)=='\n'|| (isLetter(lookAhead(input,i,1))==true&&lookAhead(input,i,1)!='r')){
 					resetState();
 					console.log('Token found: Identifier');
 					//create identifier token
@@ -191,7 +191,7 @@ DONE   newLineChar
 				//create Print Token
 				break;
 			case 6://receive just "w"
-				if(lookAhead(input,i,1)=='' || lookAhead(input,i,1)==' '|| lookAhead(input,i,1)=='\n'){
+				if(lookAhead(input,i,1)=='' || lookAhead(input,i,1)==' '|| lookAhead(input,i,1)=='\n'|| (isLetter(lookAhead(input,i,1))==true&&lookAhead(input,i,1)!='h')){//lookAhead(input,i,1)=='' || lookAhead(input,i,1)==' '|| lookAhead(input,i,1)=='\n'
 					resetState();
 					console.log('Token found: Identifier');
 					//create identifier token
@@ -203,7 +203,7 @@ DONE   newLineChar
 				//create While Token
 				break;
 			case 11://receive just "i"
-				if(lookAhead(input,i,1)=='' || lookAhead(input,i,1)==' '|| lookAhead(input,i,1)=='\n'){
+				if(lookAhead(input,i,1)=='' || lookAhead(input,i,1)==' '|| lookAhead(input,i,1)=='\n'|| (isLetter(lookAhead(input,i,1))==true&&(lookAhead(input,i,1)!='n')||lookAhead(input,i,1)!='f')){
 					resetState();
 					console.log('Token found: Identifier');
 					//create identifier token
@@ -220,8 +220,9 @@ DONE   newLineChar
 				//create type Token
 				break;
  			case 15:
-				if(isLetter(lookAhead(input,i,1))===true && lookAhead(input,i,1)!= 'b'&& lookAhead(input,i,1)!= 'p'&& lookAhead(input,i,1)!= 'w'&& lookAhead(input,i,1)!= 's'&& lookAhead(input,i,1)!= 'i'&& lookAhead(input,i,1)!= 't'&& lookAhead(input,i,1)!= 'f'){
-					console.log('LOOK MA CHARACTERS'); 
+			//readd this if statement if continuous string are to be disallowed
+				if(1==2) {//&& lookAhead(input,i,1)!= 'b'&& lookAhead(input,i,1)!= 'p'&& lookAhead(input,i,1)!= 'w'&& lookAhead(input,i,1)!= 's'&& lookAhead(input,i,1)!= 'i'&& lookAhead(input,i,1)!= 't'&& lookAhead(input,i,1)!= 'f')
+					console.log('LOOK MA CHARACTERS');
 					state=51;
 					return;
 				}else{
@@ -231,7 +232,7 @@ DONE   newLineChar
 				//create identifier Token
 				break;
 			case 16://receive just "s"
-				if(lookAhead(input,i,1)=='' || lookAhead(input,i,1)==' '|| lookAhead(input,i,1)=='\n'){
+				if(lookAhead(input,i,1)=='' || lookAhead(input,i,1)==' '|| lookAhead(input,i,1)=='\n'|| (isLetter(lookAhead(input,i,1))==true&&lookAhead(input,i,1)!='t')){
 					resetState();
 					console.log('Token found: Identifier');
 					//create identifier token
@@ -245,7 +246,7 @@ DONE   newLineChar
 				//create string type Token
 				break;
 			case 22://check for just "b"
-				if(lookAhead(input,i,1)=='' || lookAhead(input,i,1)==' '|| lookAhead(input,i,1)=='\n'){
+				if(lookAhead(input,i,1)=='' || lookAhead(input,i,1)==' '|| lookAhead(input,i,1)=='\n'|| (isLetter(lookAhead(input,i,1))==true&&lookAhead(input,i,1)!='o')){
 					resetState();
 					console.log('Token found: Identifier');
 					//create identifier token
@@ -258,7 +259,7 @@ DONE   newLineChar
 				//create boolean type Token
 				break;
 			case 29://receive just "t"
-				if(lookAhead(input,i,1)=='' || lookAhead(input,i,1)==' '|| lookAhead(input,i,1)=='\n'){
+				if(lookAhead(input,i,1)=='' || lookAhead(input,i,1)==' '|| lookAhead(input,i,1)=='\n'|| (isLetter(lookAhead(input,i,1))==true&&lookAhead(input,i,1)!='r')){
 					resetState();
 					console.log('Token found: Identifier');
 					//create identifier token
@@ -270,7 +271,7 @@ DONE   newLineChar
 				//create True BoolVal Token
 				break;
 			case 33://receive just "f"
-				if(lookAhead(input,i,1)=='' || lookAhead(input,i,1)==' '|| lookAhead(input,i,1)=='\n'){
+				if(lookAhead(input,i,1)=='' || lookAhead(input,i,1)==' '|| lookAhead(input,i,1)=='\n'|| (isLetter(lookAhead(input,i,1))==true&&lookAhead(input,i,1)!='a')){
 					resetState();
 					console.log('Token found: Identifier');
 					//create identifier token
