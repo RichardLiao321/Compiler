@@ -60,7 +60,6 @@ DONE   assignment vs equality
 DONE   deny multiple digits
        token line #
        what happens after token is found/found?
-	   Check for even num of quotes 
 	   HANDLE WHATEVER IS IN BETWEEN QUOTES OHGODHOW
 	   Error handling.
 	   Replace console.logs() with real messages
@@ -112,7 +111,6 @@ DONE   newLineChar
 /*==  @=  q40*/	[51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,41 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 , 40, 40],
 /*@==     q41*/	[51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 , 41, 41],
 /*ChrList q42*/	[42 ,42 ,42 ,42 ,42 ,42 ,42 ,42 ,42 ,42 ,42 ,42 ,42 ,42 ,42 ,42 ,42 ,42 ,42 ,42 ,42 ,42 ,42 ,42 ,42 ,42 ,42 ,42 ,42 ,42 ,42 ,42 ,42 ,42 ,42 ,42 ,42 ,42 ,42 ,42 ,42 ,42 ,42 ,43 ,42 , 42, 42],
-//		/*q43*/	[42 ,42 ,42 ,42 ,42 ,42 ,42 ,42 ,42 ,42 ,42 ,42 ,42 ,42 ,42 ,42 ,42 ,42 ,42 ,42 ,42 ,42 ,42 ,42 ,42 ,42 ,42 ,42 ,42 ,42 ,42 ,42 ,42 ,42 ,42 ,42 ,42 ,42 ,42 ,42 ,42 ,42 ,42 ,43 ,51 , 42, 51],
 /*@ChrListq43*/	[51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 , 43, 43],
 /*@digit  q44*/	[51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 , 44, 44],
 /* @+     q45*/	[51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 , 45, 45],
@@ -145,9 +143,9 @@ DONE   newLineChar
         sourceCode = trim(sourceCode);
         //remove \n too.
 		//sourceCode = sourceCode.replace(/(\r\n|\n|\r)/gm,"");
-		console.log('Lexing String: '+sourceCode);
-		if(sourceCode.charAt(sourceCode.length)!='$'){
-			console.log('Warning No EOF character($) found...');
+		putMessage('Lexing String: '+sourceCode);
+		if(!sourceCode.includes('$')){
+			putMessage('Warning No EOF character($) found...');
 			sourceCode=sourceCode+'$';
 		}
 		//remove all spaces in the middle;
@@ -159,143 +157,150 @@ DONE   newLineChar
 		//DFA State starts at 0
 		state=0;
 		var c;
+		var lineNum=1;
 		//loop through input string
 		for(i=0;i<str.length;i++){
 			//c is the character at i, mapped to the map
 			c=get(str.charAt(i));
 			//Check for inputs not in the alphabet
+			if(c=="\n"){
+				lineNum++;
+			}
 			if(!isNaN(c)){
-				console.log("got char "+str.charAt(i)+": "+c);
+				//putMessage("got char "+str.charAt(i)+": "+c);
 				try {
 					//find next state in matrix.
 					state=delta[state][c];
-					//console.log("moving to state: "+state);
+					//putMessage("moving to state: "+state);
 					//pass string and current position to checkState to check next char in input
-					checkState(str,i);
+					checkState(str,i,lineNum);
 				}catch(err) {
 					//on err, go to state 51, error state
 					state=51;
 				}//eo try catch
 			}else{
-				console.log("Invalid input: "+str.charAt(i));
+				putMessage("Invalid input: "+str.charAt(i));
 				return;
 			}//eo if
 		}//eo for
 	}//eo process
 	//Checks the current state for an accept state.
 	//If so, creates the appropriate token and resets the state
-	function checkState(string,pos){
+	var inString=false;
+	function checkState(string,pos,lineNum){
 		var input=string;
 		var i=pos;
-		console.log("checking state: "+state);
+		var line =lineNum;
+		putMessage("checking state: "+state);
 		switch(state) {
 			case 1://receive just "p"
-				if(lookAhead(input,i,1)=='' || lookAhead(input,i,1)==' '|| lookAhead(input,i,1)=='\n'|| (isLetter(lookAhead(input,i,1))==true&&lookAhead(input,i,1)!='r')){
+				if(lookAhead(input,i,1)=='' || lookAhead(input,i,1)==' '|| lookAhead(input,i,1)=='\n'|| lookAhead(input,i,1)=='$' || (isLetter(lookAhead(input,i,1))==true&&lookAhead(input,i,1)!='r')){
 					resetState();
-					console.log('Token found: Identifier');
+					putMessage('Token found: Identifier('+input.charAt(i)+') at line '+line);
 					//create identifier token
 				}
 				break;
 			case 5:
 				resetState();
-				console.log('Token found: Print');
+				putMessage('Token found: Print');
 				//create Print Token
 				break;
 			case 6://receive just "w"
-				if(lookAhead(input,i,1)=='' || lookAhead(input,i,1)==' '|| lookAhead(input,i,1)=='\n'|| (isLetter(lookAhead(input,i,1))==true&&lookAhead(input,i,1)!='h')){//lookAhead(input,i,1)=='' || lookAhead(input,i,1)==' '|| lookAhead(input,i,1)=='\n'
+				if(lookAhead(input,i,1)=='' || lookAhead(input,i,1)==' '|| lookAhead(input,i,1)=='\n'|| lookAhead(input,i,1)=='$' || (isLetter(lookAhead(input,i,1))==true&&lookAhead(input,i,1)!='h')){
+					//lookAhead(input,i,1)=='' || lookAhead(input,i,1)==' '|| lookAhead(input,i,1)=='\n'
 					resetState();
-					console.log('Token found: Identifier');
+					putMessage('Token found: Identifier('+input.charAt(i)+') at line '+line);
 					//create identifier token
 				}
 				break;
 			case 10:
 				resetState();
-				console.log('Token found: While');
+				putMessage('Token found: While');
 				//create While Token
 				break;
 			case 11://receive just "i"
-				if(lookAhead(input,i,1)=='' || lookAhead(input,i,1)==' '|| lookAhead(input,i,1)=='\n'|| (isLetter(lookAhead(input,i,1))==true&&(lookAhead(input,i,1)!='n')||lookAhead(input,i,1)!='f')){
+				if(isLetter(lookAhead(input,i,1)) && (lookAhead(input,i,1)!='n'||lookAhead(input,i,1)!='f')){
+					return;
+				}else if(lookAhead(input,i,1)=='' || lookAhead(input,i,1)==' '|| lookAhead(input,i,1)=='\n'|| lookAhead(input,i,1)=='$'){
 					resetState();
-					console.log('Token found: Identifier');
+					putMessage('Token found: Identifier('+input.charAt(i)+') at line '+line);
 					//create identifier token
 				}
 				break;
 			case 12:
 				resetState();
-				console.log('Token found: If');
+				putMessage('Token found: If at line '+line);
 				//create if Token
 				break;
 			case 14:
 				resetState();
-				console.log('Token found: Type');
+				putMessage('Token found: Type(int) at line '+line);
 				//create type Token
 				break;
  			case 15:
 			//readd this if statement if continuous string are to be disallowed
-				if(1==2) {//&& lookAhead(input,i,1)!= 'b'&& lookAhead(input,i,1)!= 'p'&& lookAhead(input,i,1)!= 'w'&& lookAhead(input,i,1)!= 's'&& lookAhead(input,i,1)!= 'i'&& lookAhead(input,i,1)!= 't'&& lookAhead(input,i,1)!= 'f')
-					console.log('LOOK MA CHARACTERS');
+				/* if(1==2) {
+					//isLetter(lookAhead(input,i,1))===true && lookAhead(input,i,1)!= 'b'&& lookAhead(input,i,1)!= 'p'&& lookAhead(input,i,1)!= 'w'&& lookAhead(input,i,1)!= 's'&& lookAhead(input,i,1)!= 'i'&& lookAhead(input,i,1)!= 't'&& lookAhead(input,i,1)!= 'f'
+					putMessage('LOOK MA CHARACTERS');
 					state=51;
 					return;
-				}else{
+				} else{}*/
 					resetState();
-					console.log('Token found: Identifier');
-				}
+					putMessage('Token found: Identifier('+input.charAt(i)+') at line '+line);
+				
 				//create identifier Token
 				break;
 			case 16://receive just "s"
-				if(lookAhead(input,i,1)=='' || lookAhead(input,i,1)==' '|| lookAhead(input,i,1)=='\n'|| (isLetter(lookAhead(input,i,1))==true&&lookAhead(input,i,1)!='t')){
+				if(lookAhead(input,i,1)=='' || lookAhead(input,i,1)==' '|| lookAhead(input,i,1)=='\n'|| lookAhead(input,i,1)=='$' || (isLetter(lookAhead(input,i,1))==true&&lookAhead(input,i,1)!='t')){
 					resetState();
-					console.log('Token found: Identifier');
+					putMessage('Token found: Identifier('+input.charAt(i)+') at line '+line);
 					//create identifier token
 				}
 				break;
 			case 21:
-				//FIXME
 				resetState();
-				console.log(input.substr(i));
-				console.log('Token found: Type');
+				putMessage('Token found: Type(string) at line '+line);
 				//create string type Token
 				break;
 			case 22://check for just "b"
-				if(lookAhead(input,i,1)=='' || lookAhead(input,i,1)==' '|| lookAhead(input,i,1)=='\n'|| (isLetter(lookAhead(input,i,1))==true&&lookAhead(input,i,1)!='o')){
+				if(lookAhead(input,i,1)=='' || lookAhead(input,i,1)==' '|| lookAhead(input,i,1)=='\n'|| lookAhead(input,i,1)=='$' || (isLetter(lookAhead(input,i,1))==true&&lookAhead(input,i,1)!='o')){
 					resetState();
-					console.log('Token found: Identifier');
+					putMessage('Token found: Identifier('+input.charAt(i)+') at line '+line);
 					//create identifier token
 				}
 				break;
 			case 28:
-				//FIXME
 				resetState();
-				console.log('Token found: Type');
+				putMessage('Token found: Type(boolean)');
 				//create boolean type Token
 				break;
 			case 29://receive just "t"
-				if(lookAhead(input,i,1)=='' || lookAhead(input,i,1)==' '|| lookAhead(input,i,1)=='\n'|| (isLetter(lookAhead(input,i,1))==true&&lookAhead(input,i,1)!='r')){
+				if(lookAhead(input,i,1)=='' || lookAhead(input,i,1)==' '|| lookAhead(input,i,1)=='\n'|| lookAhead(input,i,1)=='$' || (isLetter(lookAhead(input,i,1))==true&&lookAhead(input,i,1)!='r')){
 					resetState();
-					console.log('Token found: Identifier');
+					putMessage('Token found: Identifier('+input.charAt(i)+') at line '+line);
 					//create identifier token
 				}
 				break;
 			case 32:
 				resetState();
-				console.log('Token found: Boolean Value');
+				putMessage('Token found: Boolean Value(true)');
 				//create True BoolVal Token
 				break;
 			case 33://receive just "f"
-				if(lookAhead(input,i,1)=='' || lookAhead(input,i,1)==' '|| lookAhead(input,i,1)=='\n'|| (isLetter(lookAhead(input,i,1))==true&&lookAhead(input,i,1)!='a')){
+				if(lookAhead(input,i,1)=='' || lookAhead(input,i,1)==' '|| lookAhead(input,i,1)=='\n'|| lookAhead(input,i,1)=='$' || (isLetter(lookAhead(input,i,1))==true&&lookAhead(input,i,1)!='a')){
 					resetState();
-					console.log('Token found: Identifier');
+					putMessage('Token found: Identifier('+input.charAt(i)+') at line '+line);
 					//create identifier token
 				}
 				break;
 			case 37:
 				resetState();
-				console.log('Token found: Boolean Value');
+				putMessage('Token found: Boolean Value('+input.charAt(i)+') at line '+line);
 				//create False BoolVal Token
 				break;
 			case 39:
 				resetState();
-				console.log('Token found: Inequality');
+				putMessage('Token found: Inequality(!=) at line '+line);
 				//create inequality Token
 				break;
 			case 40:
@@ -304,77 +309,91 @@ DONE   newLineChar
 					return;
 				}else{
 					resetState();
-					console.log('Token found: Assignment');
+					putMessage('Token found: Assignment(=) at line '+line);
 					//create Assignment Token
 				}
 				break;
 			case 41:
 				resetState();
-				console.log('Token found: Equality');
+				putMessage('Token found: Equality(==) at line '+line);
 				//create equality Token
 				break;
 			case 42:
-				//resetState();
-				console.log('Token found: "');
-				//create " Token
+				if(inString && (lookAhead(input,i,1)=='' || lookAhead(input,i,1)=='\n' || lookAhead(input,i,1)=='$')){
+					state=51;
+					putMessage('Error ');
+					return;
+				}else
+				if(!inString){
+					//resetState();
+					putMessage('Token found: Quote(") at line '+line);
+					inString=true;
+					//create " Token
+				}else if(inString){
+					//resetState();
+					//inString=false;
+					putMessage('Token found:Char('+input.charAt(i)+') at line '+line);
+				}
 				break;
 			case 43:
 			//FIXME
+				inString=false;
 				resetState();
-				console.log('Token found: String');
+				putMessage('Token found: String at line '+line);
 				//create String Token
 				//create " Token
 				break;
 			case 44:
 			//check for more than 1 digit. If so, self destruct computer
 				/* if(!isNaN(parseInt(lookAhead(input,i,1)))){
-					console.log("ANOTHER DIGIT! BURN THE WITCH!");
+					putMessage("ANOTHER DIGIT! BURN THE WITCH!");
 					return;
 				}else{
 					resetState();
-					console.log('Token found: Digit');
+					putMessage('Token found: Digit');
 					//create digit Token
 				} */
 				resetState();
-				console.log('Token found: Digit');
+				putMessage('Token found: Digit('+i+') at line '+line);
 				break;
 			case 45:
 				resetState();
-				console.log('Token found: Integer Operator');
+				putMessage('Token found: Integer Operator(+) at line '+line);
 				//create Integer Operator Token
 				break;
 			case 46:
 				resetState();
-				console.log('Token found: Left Bracket');
+				putMessage('Token found: Left Bracket("{") at line '+line);
 				//create Left Bracket Token
 				break;
 			case 47:
 				resetState();
-				console.log('Token found: Right Bracket');
+				putMessage('Token found: Right Bracket("}") at line '+line);
 				//create Right Bracket Token
 				break;
 			case 48:
 				resetState();
-				console.log('Token found: Left Parenthesis');
+				putMessage('Token found: Left Parenthesis("(") at line '+line);
 				//create Left Parenthesis Token
 				break;
 			case 49:
 				resetState();
-				console.log('Token found: Right Parenthesis');
+				putMessage('Token found: Right Parenthesis(")") at line '+line);
 				//create right Parenthesis Token
 				break;
 			case 50:
 				resetState();
-				console.log('Token found: EOF');
+				putMessage('Token found: EOF($) at line '+line);
 				//create EOF Token
 				break;
 			case 51:
-				console.log('Token found: Error');
+				resetState();
+				putMessage('Error: Lexer at line '+line);
 				//create Error Token
 				break;
 			default:
 				if(lookAhead(input,i,1)==""){
-					console.log('ERROR ERROR ERROR');
+					putMessage('ERROR ERROR ERROR');
 					//create error token
 					state =51;
 					return;
