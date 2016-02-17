@@ -52,7 +52,7 @@
 	function get(k){
 		return map[k];
 	};
-	var tokenArray =new Array();
+	var tokenArray =[];
 	function printTokenArray(){
 	putMessage("Lexer got: ");
 		for(i=0;i<tokenArray.length;i++){
@@ -66,7 +66,7 @@
 DONE   deny continous word ex:yay!
 DONE   assignment vs equality
 DONE   deny multiple digits
-       token line #
+DONE   token line #
        what happens after token is found/found?
 	   HANDLE WHATEVER IS IN BETWEEN QUOTES OHGODHOW
 	   Error handling.
@@ -171,11 +171,11 @@ DONE   newLineChar
 			//c is the character at i, mapped to the map
 			c=get(str.charAt(i));
 			//Check for inputs not in the alphabet
-			if(c=="\n"){
+			if(str.charAt(i)=="\n"){
 				lineNum++;
 			}
 			if(!isNaN(c)){
-				//putMessage("got char "+str.charAt(i)+": "+c);
+				putMessage("got char "+str.charAt(i)+": "+c);
 				try {
 					//find next state in matrix.
 					state=delta[state][c];
@@ -199,10 +199,11 @@ DONE   newLineChar
 		var input=string;
 		var i=pos;
 		var line =lineNum;
-		//putMessage("checking state: "+state);
+		putMessage("checking state: "+state);
 		switch(state) {
 			case 1://receive just "p"
-				if(lookAhead(input,i,1)=='' || lookAhead(input,i,1)==' '|| lookAhead(input,i,1)=='\n'|| lookAhead(input,i,1)=='$' || (isLetter(lookAhead(input,i,1))==true&&lookAhead(input,i,1)!='r')){
+			//(lookAhead(input,i,1)=='' || lookAhead(input,i,1)==' '|| lookAhead(input,i,1)=='\n'|| lookAhead(input,i,1)=='$' || !isLetter(lookAhead(input,i,1))) DISALLOW CONTINOUS STRINGS
+				if(lookAhead(input,i,1)=='' || lookAhead(input,i,1)==' '|| lookAhead(input,i,1)=='\n'|| lookAhead(input,i,1)=='$' || (isLetter(lookAhead(input,i,1))&&lookAhead(input,i,1)!='r')){
 					resetState();
 					//putMessage('Token found: Identifier('+input.charAt(i)+') at line '+line);
 					//create identifier token
@@ -214,7 +215,7 @@ DONE   newLineChar
 				resetState();
 				putMessage('Token found: Print');
 				//create Print Token
-				var x = new token('Print',null,line);
+				tokenArray.push(new token('Keyword','Print',line));
 				tokenArray.push(x);
 				break;
 			case 6://receive just "w"
@@ -262,17 +263,18 @@ DONE   newLineChar
 				break;
  			case 15:
 			//readd this if statement if continuous string are to be disallowed
-				/* if(1==2) {
+				 if(isLetter(lookAhead(input,i,1))===true && lookAhead(input,i,1)!= 'b'&& lookAhead(input,i,1)!= 'p'&& lookAhead(input,i,1)!= 'w'&& lookAhead(input,i,1)!= 's'&& lookAhead(input,i,1)!= 'i'&& lookAhead(input,i,1)!= 't'&& lookAhead(input,i,1)!= 'f') {
 					//isLetter(lookAhead(input,i,1))===true && lookAhead(input,i,1)!= 'b'&& lookAhead(input,i,1)!= 'p'&& lookAhead(input,i,1)!= 'w'&& lookAhead(input,i,1)!= 's'&& lookAhead(input,i,1)!= 'i'&& lookAhead(input,i,1)!= 't'&& lookAhead(input,i,1)!= 'f'
 					putMessage('LOOK MA CHARACTERS');
 					state=51;
 					return;
-				} else{}*/
-				resetState();
-				//putMessage('Token found: Identifier('+input.charAt(i)+') at line '+line);
-				//create identifier Token
-				//var x = new token('Identifier',input.charAt(i),line);
-				tokenArray.push(new token('Identifier',input.charAt(i),line));
+				}else{
+					resetState();
+					//putMessage('Token found: Identifier('+input.charAt(i)+') at line '+line);
+					//create identifier Token
+					//var x = new token('Identifier',input.charAt(i),line);
+					tokenArray.push(new token('Identifier',input.charAt(i),line));
+				}
 				break;
 			case 16://receive just "s"
 				if(lookAhead(input,i,1)=='' || lookAhead(input,i,1)==' '|| lookAhead(input,i,1)=='\n'|| lookAhead(input,i,1)=='$' || (isLetter(lookAhead(input,i,1))==true&&lookAhead(input,i,1)!='t')){
@@ -384,18 +386,19 @@ DONE   newLineChar
 				break;
 			case 44:
 			//check for more than 1 digit. If so, self destruct computer
-				/* if(!isNaN(parseInt(lookAhead(input,i,1)))){
+				 if(!isNaN(parseInt(lookAhead(input,i,1)))){
 					putMessage("ANOTHER DIGIT! BURN THE WITCH!");
 					return;
 				}else{
 					resetState();
 					putMessage('Token found: Digit');
 					//create digit Token
-				} */
-				resetState();
+					tokenArray.push(new token('Digit',input.charAt(i),line));
+				} 
+				//resetState();
 				//putMessage('Token found: Digit('+i+') at line '+line);
 				//create Digit token
-				tokenArray.push(new token('Digit',input.charAt(i),line));
+				//tokenArray.push(new token('Digit',input.charAt(i),line));
 				break;
 			case 45:
 				resetState();
