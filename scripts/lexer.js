@@ -40,8 +40,8 @@
 	map['=']=36;
 	map['!']=37;
 	map['(']=38;
-	map[')']=41;
-	map['{']=42;
+	map[')']=39;
+	map['{']=40;
 	map['}']=41;
 	map['$']=42;
 	map['"']=43;
@@ -74,7 +74,7 @@ DONE   token line #
 DONE   newLineChar
 */
 	var delta =[
-		//		| 0 | 1	| 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10| 11| 12| 13| 14| 15| 16| 17| 18| 19| 20| 21| 22| 23| 24| 25| 26| 27| 28| 29| 30| 31| 32| 33| 34| 35| 36| 37| 38| 41| 42| 41| 42| 43| 44| 45| 46|
+		//		| 0 | 1	| 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10| 11| 12| 13| 14| 15| 16| 17| 18| 19| 20| 21| 22| 23| 24| 25| 26| 27| 28| 29| 30| 31| 32| 33| 34| 35| 36| 37| 38| 39| 40| 41| 42| 43| 44| 45| 46|
 		//      | a | b | c | d | e | f | g | h | i | j | k | l | m | n | o | p | q | r | s | t | u | v | w | x | y | z | 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | = | ! | ( | ) | { | } | $ | " | + | sp| \n|
 		/*q0*/	[15 ,22 ,15 ,15 ,15 ,33 ,15 ,15 ,11 ,15 ,15 ,15 ,15 ,15 ,15 ,1  ,15 ,15 ,16 ,29 ,15 ,15 ,6	,15 ,15 ,15 ,44 ,44 ,44 ,44 ,44 ,44 ,44 ,44 ,44 ,44 ,40 ,38 ,48 ,49 ,46 ,47 ,50 ,42 ,45 , 0 , 0	],
 /*Print   q1*/	[51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,2  ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 , 15, 15],
@@ -263,7 +263,7 @@ DONE   newLineChar
 				break;
  			case 15:
 			//readd this if statement if continuous string are to be disallowed
-				 if(isLetter(lookAhead(input,i,1))===true && lookAhead(input,i,1)!= 'b'&& lookAhead(input,i,1)!= 'p'&& lookAhead(input,i,1)!= 'w'&& lookAhead(input,i,1)!= 's'&& lookAhead(input,i,1)!= 'i'&& lookAhead(input,i,1)!= 't'&& lookAhead(input,i,1)!= 'f') {
+				 if(1==2) {
 					//isLetter(lookAhead(input,i,1))===true && lookAhead(input,i,1)!= 'b'&& lookAhead(input,i,1)!= 'p'&& lookAhead(input,i,1)!= 'w'&& lookAhead(input,i,1)!= 's'&& lookAhead(input,i,1)!= 'i'&& lookAhead(input,i,1)!= 't'&& lookAhead(input,i,1)!= 'f'
 					putMessage('LOOK MA CHARACTERS');
 					state=51;
