@@ -161,6 +161,8 @@ DONE   newLineChar
 		printTokenArray();
         return tokenArray;
     }//eo lex
+	
+	//Traverse DFA and simple checks
 	function process(str){
 		//DFA State starts at 0
 		state=0;
@@ -376,7 +378,6 @@ DONE   newLineChar
 				}
 				break;
 			case 43:
-			//FIXME
 				inString=false;
 				resetState();
 				//putMessage('Token found: String at line '+line);
@@ -386,7 +387,7 @@ DONE   newLineChar
 				break;
 			case 44:
 			//check for more than 1 digit. If so, self destruct computer
-				 if(!isNaN(parseInt(lookAhead(input,i,1)))){
+				 /* if(!isNaN(parseInt(lookAhead(input,i,1)))){
 					putMessage("ANOTHER DIGIT! BURN THE WITCH!");
 					return;
 				}else{
@@ -394,11 +395,11 @@ DONE   newLineChar
 					putMessage('Token found: Digit');
 					//create digit Token
 					tokenArray.push(new token('Digit',input.charAt(i),line));
-				} 
-				//resetState();
+				}  */
+				resetState();
 				//putMessage('Token found: Digit('+i+') at line '+line);
 				//create Digit token
-				//tokenArray.push(new token('Digit',input.charAt(i),line));
+				tokenArray.push(new token('Digit',input.charAt(i),line));
 				break;
 			case 45:
 				resetState();
