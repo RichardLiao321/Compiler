@@ -52,18 +52,16 @@
 	function get(k){
 		return map[k];
 	};
-	var tokenArray =[];
-	function printTokenArray(){
+	function printtokens(){
 	putMessage("Lexer got: ");
-		for(i=0;i<tokenArray.length;i++){
-			putMessage(tokenArray[i].printMe());
+		for(i=0;i<tokens.length;i++){
+			putMessage(tokens[i].printMe());
 		}
 		
-	}//eo printTokenArray
+	}//eo printtokens
 /*HUGE MATRIX INCOMING. FINDING NE(M)O.
 @==accepting state
 @TODO: 
-DONE   deny continous word ex:yay!
 DONE   assignment vs equality
 DONE   deny multiple digits
 DONE   token line #
@@ -158,8 +156,8 @@ DONE   newLineChar
 		//remove all spaces in the middle;
 		//sourceCode = sourceCode.replace(/\s/g,'');
 		process(sourceCode);
-		printTokenArray();
-        return tokenArray;
+		printtokens();
+        return tokens;
     }//eo lex
 	function process(str){
 		//DFA State starts at 0
@@ -211,15 +209,15 @@ DONE   newLineChar
 					//putMessage('Token found: Identifier('+input.charAt(i)+') at line '+line);
 					//create identifier token
 					//var x = new token('Identifier',input.charAt(i),line);
-					tokenArray.push(new token('Identifier',input.charAt(i),line));
+					tokens.push(new token('Identifier',input.charAt(i),line));
 				}
 				break;
 			case 5:
 				resetState();
 				putMessage('Token found: Print');
 				//create Print Token
-				tokenArray.push(new token('Keyword','Print',line));
-				//tokenArray.push(x);
+				tokens.push(new token('Keyword','Print',line));
+				//tokens.push(x);
 				break;
 			case 6://receive just "w"
 				if(lookAhead(input,i,1)=='' || lookAhead(input,i,1)==' '|| lookAhead(input,i,1)=='\n'|| lookAhead(input,i,1)=='$' || (isLetter(lookAhead(input,i,1))==true&&lookAhead(input,i,1)!='h')){
@@ -228,7 +226,7 @@ DONE   newLineChar
 					//putMessage('Token found: Identifier('+input.charAt(i)+') at line '+line);
 					//create identifier token
 					//var x = new token('Identifier',input.charAt(i),line);
-					tokenArray.push(new token('Identifier',input.charAt(i),line));
+					tokens.push(new token('Identifier',input.charAt(i),line));
 				}
 				break;
 			case 10:
@@ -236,7 +234,7 @@ DONE   newLineChar
 				//putMessage('Token found: While');
 				//create While Token
 				//var x = new token('While',null,line);
-				tokenArray.push(new token('Keyword','While',line));
+				tokens.push(new token('Keyword','While',line));
 				break;
 			case 11://receive just "i"
 				if(lookAhead(input,i,1)=='n'||lookAhead(input,i,1)=='f'){
@@ -247,7 +245,7 @@ DONE   newLineChar
 					//putMessage('Token found: Identifier('+input.charAt(i)+') at line '+line);
 					//create identifier token
 					//var x = new token('Identifier',input.charAt(i),line);
-					tokenArray.push(new token('Identifier',input.charAt(i),line));
+					tokens.push(new token('Identifier',input.charAt(i),line));
 				}
 				break;
 			case 12:
@@ -255,14 +253,14 @@ DONE   newLineChar
 				//putMessage('Token found: If at line '+line);
 				//create if Token
 				//var x = new token('If',null,line);
-				tokenArray.push(new token('Keyword','If',line));
+				tokens.push(new token('Keyword','If',line));
 				break;
 			case 14:
 				resetState();
 				//putMessage('Token found: Type(int) at line '+line);
 				//create type Token
 				//var x = new token('Type','int',line);
-				tokenArray.push(new token('Type','Int',line));
+				tokens.push(new token('Type','Int',line));
 				break;
  			case 15:
 			//readd this if statement if continuous string are to be disallowed
@@ -276,7 +274,7 @@ DONE   newLineChar
 				//putMessage('Token found: Identifier('+input.charAt(i)+') at line '+line);
 				//create identifier Token
 				//var x = new token('Identifier',input.charAt(i),line);
-				tokenArray.push(new token('Identifier',input.charAt(i),line));
+				tokens.push(new token('Identifier',input.charAt(i),line));
 				}
 				break;
 			case 16://receive just "s"
@@ -285,7 +283,7 @@ DONE   newLineChar
 					//putMessage('Token found: Identifier('+input.charAt(i)+') at line '+line);
 					//create identifier token
 					//var x = new token('Identifier',input.charAt(i),line);
-					tokenArray.push(new token('Identifier',input.charAt(i),line));
+					tokens.push(new token('Identifier',input.charAt(i),line));
 				}
 				break;
 			case 21:
@@ -299,14 +297,14 @@ DONE   newLineChar
 					//putMessage('Token found: Identifier('+input.charAt(i)+') at line '+line);
 					//create identifier token
 					//var x = new token('Identifier',input.charAt(i),line);
-					tokenArray.push(new token('Identifier',input.charAt(i),line));
+					tokens.push(new token('Identifier',input.charAt(i),line));
 				}
 				break;
 			case 28:
 				resetState();
 				//putMessage('Token found: Type(boolean)');
 				//create boolean type Token
-				tokenArray.push(new token('Type','Boolean',line));
+				tokens.push(new token('Type','Boolean',line));
 				break;
 			case 29://receive just "t"
 				if(lookAhead(input,i,1)=='' || lookAhead(input,i,1)==' '|| lookAhead(input,i,1)=='\n'|| lookAhead(input,i,1)=='$' || (isLetter(lookAhead(input,i,1))==true&&lookAhead(input,i,1)!='r')){
@@ -314,33 +312,33 @@ DONE   newLineChar
 					//putMessage('Token found: Identifier('+input.charAt(i)+') at line '+line);
 					//create identifier token
 					//var x = new token('Identifier',input.charAt(i),line);
-					tokenArray.push(new token('Identifier',input.charAt(i),line));
+					tokens.push(new token('Identifier',input.charAt(i),line));
 				}
 				break;
 			case 32:
 				resetState();
 				//putMessage('Token found: Boolean Value(true)');
 				//create True BoolVal Token
-				tokenArray.push(new token('Boolean Value','True',line));
+				tokens.push(new token('Boolean Value','True',line));
 				break;
 			case 33://receive just "f"
 				if(lookAhead(input,i,1)=='' || lookAhead(input,i,1)==' '|| lookAhead(input,i,1)=='\n'|| lookAhead(input,i,1)=='$' || (isLetter(lookAhead(input,i,1))==true&&lookAhead(input,i,1)!='a')){
 					resetState();
 					//putMessage('Token found: Identifier('+input.charAt(i)+') at line '+line);
 					//create identifier token
-					tokenArray.push(new token('Identifier',input.charAt(i),line));
+					tokens.push(new token('Identifier',input.charAt(i),line));
 				}
 				break;
 			case 37:
 				resetState();
 				//putMessage('Token found: Boolean Value('+input.charAt(i)+') at line '+line);
 				//create False BoolVal Token
-				tokenArray.push(new token('Type','False',line));
+				tokens.push(new token('Type','False',line));
 				break;
 			case 39:
 				resetState();
 				//putMessage('Token found: Inequality(!=) at line '+line);
-				tokenArray.push(new token('Inequality','!=',line));
+				tokens.push(new token('Inequality','!=',line));
 				//create inequality Token
 				break;
 			case 40:
@@ -351,14 +349,14 @@ DONE   newLineChar
 					resetState();
 					//putMessage('Token found: Assignment(=) at line '+line);
 					//create Assignment Token
-					tokenArray.push(new token('Assignment','=',line));
+					tokens.push(new token('Assignment','=',line));
 				}
 				break;
 			case 41:
 				resetState();
 				//putMessage('Token found: Equality(==) at line '+line);
 				//create equality Token
-				tokenArray.push(new token('Equality','==',line));
+				tokens.push(new token('Equality','==',line));
 				break;
 			case 42:
 			putMessage("at state 42: "+inString);
@@ -368,14 +366,14 @@ DONE   newLineChar
 					st="";
 					inString=true;
 					//create " Token
-					tokenArray.push(new token('Quote','"',line));
+					tokens.push(new token('Quote','"',line));
 				}else if(inString){
 					//resetState();
 					//inString=false;
 					//putMessage('Token found:Char('+input.charAt(i)+') at line '+line);
 					st=st+input.charAt(i);
 					putMessage("String:"+st);
-					//tokenArray.push(new token('String Char',input.charAt(i),line));
+					//tokens.push(new token('String Char',input.charAt(i),line));
 				}else{
 					console.log(st);
 					return;
@@ -389,9 +387,9 @@ DONE   newLineChar
 				//putMessage('Token found: String at line '+line);
 				//create String Token
 				//create " Token
-				tokenArray.push(new token('String',st,line));
+				tokens.push(new token('String',st,line));
 				st="";
-				tokenArray.push(new token('Quote','"',line));
+				tokens.push(new token('Quote','"',line));
 				break;
 			case 44:
 			//check for more than 1 digit. If so, self destruct computer
@@ -402,48 +400,48 @@ DONE   newLineChar
 					resetState();
 					putMessage('Token found: Digit');
 					//create digit Token
-					tokenArray.push(new token('Digit',input.charAt(i),line));
+					tokens.push(new token('Digit',input.charAt(i),line));
 				}  */
 				resetState();
 				//putMessage('Token found: Digit('+i+') at line '+line);
 				//create Digit token
-				tokenArray.push(new token('Digit',input.charAt(i),line));
+				tokens.push(new token('Digit',input.charAt(i),line));
 				break;
 			case 45:
 				resetState();
 				//putMessage('Token found: Integer Operator(+) at line '+line);
 				//create Integer Operator Token
-				tokenArray.push(new token('Intop',input.charAt(i),line));
+				tokens.push(new token('Intop',input.charAt(i),line));
 				break;
 			case 46:
 				resetState();
 				//putMessage('Token found: Left Bracket("{") at line '+line);
 				//create Left Bracket Token
-				tokenArray.push(new token('LeftBracket',input.charAt(i),line));
+				tokens.push(new token('LeftBracket',input.charAt(i),line));
 				break;
 			case 47:
 				resetState();
 				//putMessage('Token found: Right Bracket("}") at line '+line);
 				//create Right Bracket Token
-				tokenArray.push(new token('RightBracket',input.charAt(i),line));
+				tokens.push(new token('RightBracket',input.charAt(i),line));
 				break;
 			case 48:
 				resetState();
 				//putMessage('Token found: Left Parenthesis("(") at line '+line);
 				//create Left Parenthesis Token
-				tokenArray.push(new token('LeftParen',input.charAt(i),line));
+				tokens.push(new token('LeftParen',input.charAt(i),line));
 				break;
 			case 49:
 				resetState();
 				//putMessage('Token found: Right Parenthesis(")") at line '+line);
 				//create right Parenthesis Token
-				tokenArray.push(new token('RightParen',input.charAt(i),line));
+				tokens.push(new token('RightParen',input.charAt(i),line));
 				break;
 			case 50:
 				resetState();
 				//putMessage('Token found: EOF($) at line '+line);
 				//create EOF Token
-				tokenArray.push(new token('EOF',input.charAt(i),line));
+				tokens.push(new token('EOF',input.charAt(i),line));
 				break;
 			case 51:
 				//resetState();
