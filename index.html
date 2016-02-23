@@ -84,6 +84,9 @@
         tokenIndex = 0;
         currentToken = ' ';
         errorCount = 0;
+		inString=false;
+		st="";
+		ct=0;
     }
     
     function btnCompile_click() {        
@@ -97,6 +100,7 @@
         //putMessage("Lex returned [" + tokens + "]");
         // . . . and parse!
         parse();
+		
     }
     
     function putMessage(msg) {

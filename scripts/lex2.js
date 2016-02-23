@@ -75,39 +75,39 @@ DONE   newLineChar
 		//		| 0 | 1	| 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10| 11| 12| 13| 14| 15| 16| 17| 18| 19| 20| 21| 22| 23| 24| 25| 26| 27| 28| 29| 30| 31| 32| 33| 34| 35| 36| 37| 38| 41| 42| 41| 42| 43| 44| 45| 46|
 		//      | a | b | c | d | e | f | g | h | i | j | k | l | m | n | o | p | q | r | s | t | u | v | w | x | y | z | 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | = | ! | ( | ) | { | } | $ | " | + | sp| \n|
 		/*q0*/	[15 ,22 ,15 ,15 ,15 ,33 ,15 ,15 ,11 ,15 ,15 ,15 ,15 ,15 ,15 ,1  ,15 ,15 ,16 ,29 ,15 ,15 ,6	,15 ,15 ,15 ,44 ,44 ,44 ,44 ,44 ,44 ,44 ,44 ,44 ,44 ,40 ,38 ,48 ,49 ,46 ,47 ,50 ,42 ,45 , 0 , 0	],
-/*Print   q1*/	[52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,2  ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 , 52, 52],
+/*Print   q1*/	[15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,2  ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 , 15, 15],
 		/*q2*/	[52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,3  ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 , 52, 52],
 		/*q3*/	[52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,4  ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 , 52, 52],
 		/*q4*/	[52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,5  ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 , 52, 52],
 /*@Print  q5*/	[51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 , 15, 51],
-/*While   q6*/	[52 ,52 ,52 ,52 ,52 ,52 ,52 ,7  ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 , 52, 52],
+/*While   q6*/	[15 ,15 ,15 ,15 ,15 ,15 ,15 ,7  ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 , 15, 15],
 		/*q7*/	[52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,8  ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 , 52, 52],
 		/*q8*/	[52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,9  ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 , 52, 52],
 		/*q9*/	[52 ,52 ,52 ,52 ,10 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 , 52, 52],
 /*@While q10*/	[51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 , 10, 10],
-/*if     q11*/	[52 ,52 ,52 ,52 ,52 ,12 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,13 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 , 52, 52],
+/*if     q11*/	[15 ,15 ,15 ,15 ,15 ,12 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,13 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 , 15, 15],
 /*@if    q12*/	[51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 , 12, 12],
-/*Int    q13*/	[52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,14 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 , 52, 52],
+/*Int    q13*/	[15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,14 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 , 15, 15],
 /*@int   q14*/	[51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 , 14, 14],
 /*@id    q15*/	[51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 , 15, 15],
-/*String q16*/	[52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,17 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 , 52, 52],
+/*String q16*/	[15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,17 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 , 15, 15],
 		/*q17*/	[52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,18 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 , 52, 52],
 		/*q18*/	[52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,19 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 , 52, 52],
 		/*q19*/	[52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,20 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 , 52, 52],
-		/*q20*/	[52 ,52 ,52 ,52 ,52 ,52 ,21 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 , 52, 52],
+		/*q20*/	[52 ,52 ,52 ,52 ,52 ,52 ,14 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 , 52, 52],
 /*@String q21*/	[51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 , 21, 21],
-/*Boolean q22*/	[52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,23 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 , 52, 52],
+/*Boolean q22*/	[15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,23 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 , 15, 15],
 		/*q23*/	[52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,24 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 , 52, 52],
 		/*q24*/	[52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,25 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 , 52, 52],
 		/*q25*/	[52 ,52 ,52 ,52 ,26 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 , 52, 52],
 		/*q26*/	[27 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 , 52, 52],
 		/*q27*/	[52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,28 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 , 52, 52],
 /*@Bool   q28*/	[51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 , 28, 28],		
-/*True    q29*/	[52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,30 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 , 52, 52],
+/*True    q29*/	[15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,30 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 , 15, 15],
 		/*q30*/	[52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,31 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 , 52, 52],
 /*        q31*/	[52 ,52 ,52 ,52 ,32 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 , 52, 52],
 /*@true   q32*/	[51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 , 32, 32],
-/*False   q33*/	[34 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 , 52, 52],
+/*False   q33*/	[34 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 ,15 , 15, 15],
 		/*q34*/	[52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,35 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 , 52, 52],
 		/*q35*/	[52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,36 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 , 52, 52],
 		/*q36*/	[52 ,52 ,52 ,52 ,37 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 ,52 , 52, 52],
@@ -142,7 +142,6 @@ DONE   newLineChar
 	function resetState(){
 		state=0;
 	}//eo resetState
-	var st="";
     function lex(){
         //Grab the "raw" source code.
         var sourceCode = document.getElementById("taSourceCode").value;
@@ -158,28 +157,24 @@ DONE   newLineChar
 		} */
 		//remove all spaces in the middle;
 		//sourceCode = sourceCode.replace(/\s/g,'');
-		st=sourceCode;
 		process(sourceCode);
 		printTokens();
         return tokens;
     }//eo lex
-	var i;
-	
 	function process(str){
 		//DFA State starts at 0
 		state=0;
-		var c=str.charAt(0);
+		var c;
 		var lineNum=1;
-		i=0;
 		//loop through input string
-		while(i<str.length){
+		for(i=0;i<str.length;i++){
 			//c is the character at i, mapped to the map
 			c=get(str.charAt(i));
-			//increment lineNum for tokens 
+			//Check for inputs not in the alphabet
 			if(str.charAt(i)=="\n"){
 				lineNum++;
 			}
-			if(!isNaN(c)){//if charAt(i) is not mapped, fail
+			if(!isNaN(c)){
 				putMessage("got char "+str.charAt(i)+": "+c);
 				try {
 					//find next state in matrix.
@@ -195,41 +190,68 @@ DONE   newLineChar
 				putMessage("Invalid input: "+str.charAt(i));
 				return;
 			}//eo if
-			i++;
-			putMessage("i: "+i);
-		}//eo while
-		
+		}//eo for
 	}//eo process
 	//Checks the current state for an accept state.
 	//If so, creates the appropriate token and resets the state
 	var inString=false;
-	
+	var st="";
 	var ct=0;
 	function checkState(string,pos,lineNum){
 		var input=string;
+		var i=pos;
 		var line=lineNum;
 		putMessage("checking state: "+state);
-		putMessage("ct: "+ct);
 		switch(state) {
+			case 0:
+			return;
+				break;
+ 			case 1://receive just "p"
+				if(lookAhead(input,i,1)=='' || lookAhead(input,i,1)==' '|| lookAhead(input,i,1)=='\n'|| lookAhead(input,i,1)=='$' || (isLetter(lookAhead(input,i,1))&&lookAhead(input,i,1)!='r')){
+					resetState();
+					//putMessage('Token found: Identifier('+input.charAt(i)+') at line '+line);
+					//create identifier token
+					//var x = new token('Identifier',input.charAt(i),line);
+					tokens.push(new token('Identifier',input.charAt(i),line));
+				}
+				break; 
 			case 5:
-			ct=i+1;
 				resetState();
 				putMessage('Token found: Print');
 				//create Print Token
 				tokens.push(new token('Keyword','Print',line));
 				//tokens.push(x);
 				break;
+ 			case 6://receive just "w"
+				if(lookAhead(input,i,1)=='' || lookAhead(input,i,1)==' '|| lookAhead(input,i,1)=='\n'|| lookAhead(input,i,1)=='$' || (isLetter(lookAhead(input,i,1))==true&&lookAhead(input,i,1)!='h')){
+					//lookAhead(input,i,1)=='' || lookAhead(input,i,1)==' '|| lookAhead(input,i,1)=='\n'
+					resetState();
+					//putMessage('Token found: Identifier('+input.charAt(i)+') at line '+line);
+					//create identifier token
+					//var x = new token('Identifier',input.charAt(i),line);
+					tokens.push(new token('Identifier',input.charAt(i),line));
+				}
+				break; 
 			case 10:
-			ct=i+1;
-			
 				resetState();
 				//putMessage('Token found: While');
 				//create While Token
 				//var x = new token('While',null,line);
 				tokens.push(new token('Keyword','While',line));
 				break;
+			case 11://receive just "i"
+				if(lookAhead(input,i,1)=='n'||lookAhead(input,i,1)=='f'){
+					//console.log('I found i'+lookAhead(input,i,1))
+					return;
+				}else if(isLetter(lookAhead(input,i,1))||lookAhead(input,i,1)=='' || lookAhead(input,i,1)==' '|| lookAhead(input,i,1)=='\n'|| lookAhead(input,i,1)=='$'){
+					resetState();
+					//putMessage('Token found: Identifier('+input.charAt(i)+') at line '+line);
+					//create identifier token
+					//var x = new token('Identifier',input.charAt(i),line);
+					tokens.push(new token('Identifier',input.charAt(i),line));
+				}
+				break; 
 			case 12:
-			ct=i+1;
 				resetState();
 				//putMessage('Token found: If at line '+line);
 				//create if Token
@@ -237,7 +259,6 @@ DONE   newLineChar
 				tokens.push(new token('Keyword','If',line));
 				break;
 			case 14:
-			ct=i+1;
 				resetState();
 				//putMessage('Token found: Type(int) at line '+line);
 				//create type Token
@@ -260,43 +281,71 @@ DONE   newLineChar
 				ct++;
 				}
 				break;
+ 			case 16://receive just "s"
+				if(lookAhead(input,i,1)=='' || lookAhead(input,i,1)==' '|| lookAhead(input,i,1)=='\n'|| lookAhead(input,i,1)=='$' || (isLetter(lookAhead(input,i,1))==true&&lookAhead(input,i,1)!='t')){
+					resetState();
+					//putMessage('Token found: Identifier('+input.charAt(i)+') at line '+line);
+					//create identifier token
+					//var x = new token('Identifier',input.charAt(i),line);
+					tokens.push(new token('Identifier',input.charAt(i),line));
+				}
+				break; 
 			case 21:
-			ct=i+1;
 				resetState();
 				//putMessage('Token found: Type(string) at line '+line);
 				//create string type Token
-				tokens.push(new token('Type','String',line));
 				break;
+ 			case 22://check for just "b"
+				if(lookAhead(input,i,1)=='' || lookAhead(input,i,1)==' '|| lookAhead(input,i,1)=='\n'|| lookAhead(input,i,1)=='$' || (isLetter(lookAhead(input,i,1))==true&&lookAhead(input,i,1)!='o')){
+					resetState();
+					//putMessage('Token found: Identifier('+input.charAt(i)+') at line '+line);
+					//create identifier token
+					//var x = new token('Identifier',input.charAt(i),line);
+					tokens.push(new token('Identifier',input.charAt(i),line));
+				}
+				break; 
 			case 28:
-			ct=i+1;
 				resetState();
 				//putMessage('Token found: Type(boolean)');
 				//create boolean type Token
 				tokens.push(new token('Type','Boolean',line));
 				break;
+			case 29://receive just "t"
+				if(lookAhead(input,i,1)=='' || lookAhead(input,i,1)==' '|| lookAhead(input,i,1)=='\n'|| lookAhead(input,i,1)=='$' || (isLetter(lookAhead(input,i,1))==true&&lookAhead(input,i,1)!='r')){
+					resetState();
+					//putMessage('Token found: Identifier('+input.charAt(i)+') at line '+line);
+					//create identifier token
+					//var x = new token('Identifier',input.charAt(i),line);
+					tokens.push(new token('Identifier',input.charAt(i),line));
+				}
+				break;
 			case 32:
-			ct=i+1;
 				resetState();
 				//putMessage('Token found: Boolean Value(true)');
 				//create True BoolVal Token
 				tokens.push(new token('Boolean Value','True',line));
 				break;
+ 			case 33://receive just "f"
+				if(lookAhead(input,i,1)=='' || lookAhead(input,i,1)==' '|| lookAhead(input,i,1)=='\n'|| lookAhead(input,i,1)=='$' || (isLetter(lookAhead(input,i,1))==true&&lookAhead(input,i,1)!='a')){
+					resetState();
+					//putMessage('Token found: Identifier('+input.charAt(i)+') at line '+line);
+					//create identifier token
+					tokens.push(new token('Identifier',input.charAt(i),line));
+				}
+				break; 
 			case 37:
-			ct=i+1;
 				resetState();
 				//putMessage('Token found: Boolean Value('+input.charAt(i)+') at line '+line);
 				//create False BoolVal Token
 				tokens.push(new token('Type','False',line));
 				break;
 			case 39:
-			ct=i+1;
 				resetState();
 				//putMessage('Token found: Inequality(!=) at line '+line);
 				tokens.push(new token('Inequality','!=',line));
 				//create inequality Token
 				break;
 			case 40:
-			ct=i+1;
 				//Need to check for this case because == has same initial input as =
 				if(lookAhead(input,i,1)=='='){
 					return;
@@ -308,14 +357,12 @@ DONE   newLineChar
 				}
 				break;
 			case 41:
-			ct=i+1;
 				resetState();
 				//putMessage('Token found: Equality(==) at line '+line);
 				//create equality Token
 				tokens.push(new token('Equality','==',line));
 				break;
 			case 42:
-			ct=i+1;
 			//putMessage("at state 42: "+inString);
 				if(!inString){
 					//resetState();
@@ -337,7 +384,6 @@ DONE   newLineChar
 				}
 				break;
 			case 43:
-			ct=i+1;
 			//FIXME
 			//console.log(inString);
 				inString=false;
@@ -350,49 +396,52 @@ DONE   newLineChar
 				tokens.push(new token('Quote','"',line));
 				break;
 			case 44:
-			ct=i+1;
+			//check for more than 1 digit. If so, self destruct computer
+				/*  if(!isNaN(parseInt(lookAhead(input,i,1)))){
+					putMessage("ANOTHER DIGIT! BURN THE WITCH!");
+					return;
+				}else{
+					resetState();
+					putMessage('Token found: Digit');
+					//create digit Token
+					tokens.push(new token('Digit',input.charAt(i),line));
+				}  */
 				resetState();
 				//putMessage('Token found: Digit('+i+') at line '+line);
 				//create Digit token
 				tokens.push(new token('Digit',input.charAt(i),line));
 				break;
 			case 45:
-			ct=i+1;
 				resetState();
 				//putMessage('Token found: Integer Operator(+) at line '+line);
 				//create Integer Operator Token
 				tokens.push(new token('Intop',input.charAt(i),line));
 				break;
 			case 46:
-			ct=i+1;
 				resetState();
 				//putMessage('Token found: Left Bracket("{") at line '+line);
 				//create Left Bracket Token
 				tokens.push(new token('LeftBracket',input.charAt(i),line));
 				break;
 			case 47:
-			ct=i+1;
 				resetState();
 				//putMessage('Token found: Right Bracket("}") at line '+line);
 				//create Right Bracket Token
 				tokens.push(new token('RightBracket',input.charAt(i),line));
 				break;
 			case 48:
-			ct=i+1;
 				resetState();
 				//putMessage('Token found: Left Parenthesis("(") at line '+line);
 				//create Left Parenthesis Token
 				tokens.push(new token('LeftParen',input.charAt(i),line));
 				break;
 			case 49:
-			ct=i+1;
 				resetState();
 				//putMessage('Token found: Right Parenthesis(")") at line '+line);
 				//create right Parenthesis Token
 				tokens.push(new token('RightParen',input.charAt(i),line));
 				break;
 			case 50:
-			ct=i+1;
 				resetState();
 				//putMessage('Token found: EOF($) at line '+line);
 				//create EOF Token
@@ -403,29 +452,22 @@ DONE   newLineChar
 				//putMessage('Error: Lexer at line '+line);
 				//create Error Token
 				break;
-			case 52:
-			putMessage("state 52");
-				while(ct<i){
-					tokens.push(new token('Identifier',input.charAt(ct),line));
-					ct++;
-					putMessage("ct(52): "+ct);
-				}
-				//c=get(input.charAt(ct))
-				//state=delta[state][c];
-				putMessage("Over here! "+input.charAt(ct));
-				resetState();  
-				//decriement i to take in the current char again to properly reset
-				i=i-1;
-				break;
 			default:
-				//ct++;
-				if(lookAhead(input,i,1)==''){
-					while(ct<i+1){
-						tokens.push(new token('Identifier',input.charAt(ct),line));
-						ct++;
-						putMessage("ct(def): "+ct);
-					}
-				}  
+			if(lookAhead(input,i,1)=='' || lookAhead(input,i,1)==' '|| lookAhead(input,i,1)=='\n'|| lookAhead(input,i,1)=='$'&&
+			(lookAhead(input,i,1)!='b'&&lookAhead(input,i,1)!='s'&&lookAhead(input,i,1)!='w'&&lookAhead(input,i,1)!='f'&&lookAhead(input,i,1)!='t'&&lookAhead(input,i,1)!='i'&&lookAhead(input,i,1)!='p')){
+				for(i2=ct;i2<pos+1;i2++){
+					tokens.push(new token('Identifier',input.charAt(i2),line));
+				}
+				resetState();
+			}else{
+				//ct++
+			}
+				/* if(lookAhead(input,i,1)=='$'){
+					putMessage('Lex error at line '+line);
+					//create error token
+					state =51;
+					return;
+				} */
 				break;
 		}//eo switch
 	}//eo checkState
