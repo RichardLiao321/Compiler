@@ -115,7 +115,7 @@
 	//var st="";
 	var inString=false;
 	var ct=0;//left index
-	var i;//current index
+	var pos;//current index
 	/*Token Class*/
 	function token(type,val,line){
 		this.type=type;
@@ -144,7 +144,7 @@
 		//sourceCode = sourceCode.replace(/(\r\n|\n|\r)/gm,"");
 		putMessage("--------Lexing!-------");
 		putMessage('Lexing String: '+sourceCode);
-		if(sourceCode.charAt(sourceCode.length)!='$'){
+		if(sourceCode.charAt(sourceCode.length-1)!='$'){
 			putMessage('Warning No EOF character($) found...');
 			sourceCode=sourceCode+'$';
 		}
@@ -158,54 +158,54 @@
 		state=0;
 		var c=str.charAt(0);
 		var lineNum=1;
-		i=0;
+		pos=0;
 		//loop through input string
-		while(i<str.length){
-			//c is the character at i, mapped to the map
-			c=get(str.charAt(i));
+		while(pos<str.length){
+			//c is the character at pos, mapped to the map
+			c=get(str.charAt(pos));
 			//increment lineNum for tokens 
-			if(str.charAt(i)=="\n"){
+			if(str.charAt(pos)=="\n"){
 				lineNum++;
 			}
-			if(!isNaN(c)){//if charAt(i) is not mapped, fail
-				//putMessage("got char "+str.charAt(i));
+			if(!isNaN(c)){//if charAt(pos) is not mapped, fail
+				//putMessage("got char "+str.charAt(pos));
 				try {
 					//find next state in matrix.
 					state=delta[state][c];
 					//putMessage("moving to state: "+state);
 					//pass string and current position to checkState to check next char in input
-					checkState(str,i,lineNum);
+					checkState(str,lineNum);
 				}catch(err) {
 					//on err, go to state 51, error state
 					state=51;
 				}//eo try catch
 			}else{
-				putMessage("Invalid input: "+str.charAt(i));
+				putMessage("Invalid input: "+str.charAt(pos));
 				return;
 			}//eo if
-			i++;
+			pos++;
 			//putMessage("i: "+i);
 		}//eo while
 		
 	}//eo process
 	//Checks the current state for an accept state.
 	//If so, creates the appropriate token and resets the state
-	function checkState(string,pos,lineNum){
+	function checkState(string,lineNum){
 		var input=string;
 		var line=lineNum;
 		//putMessage("checking state: "+state);
 		//putMessage("ct: "+ct);
 		switch(state) {
 			case 5:
-			ct=i+1;
+			ct=pos+1;
 				resetState();
-				putMessage('Token found: Print');
+				//putMessage('Token found: Print');
 				//create Print Token
 				tokens.push(new token('Keyword','Print',line));
 				//tokens.push(x);
 				break;
 			case 10:
-			ct=i+1;
+			ct=pos+1;
 				resetState();
 				//putMessage('Token found: While');
 				//create While Token
@@ -213,7 +213,7 @@
 				tokens.push(new token('Keyword','While',line));
 				break;
 			case 12:
-			ct=i+1;
+			ct=pos+1;
 				resetState();
 				//putMessage('Token found: If at line '+line);
 				//create if Token
@@ -221,7 +221,7 @@
 				tokens.push(new token('Keyword','If',line));
 				break;
 			case 14:
-			ct=i+1;
+			ct=pos+1;
 				resetState();
 				//putMessage('Token found: Type(int) at line '+line);
 				//create type Token
@@ -233,48 +233,48 @@
 				//putMessage('Token found: Identifier('+input.charAt(i)+') at line '+line);
 				//create identifier Token
 				//var x = new token('Identifier',input.charAt(i),line);
-				tokens.push(new token('Identifier',input.charAt(i),line));
+				tokens.push(new token('Identifier',input.charAt(pos),line));
 				ct++;
 				break;
 			case 21:
-			ct=i+1;
+			ct=pos+1;
 				resetState();
 				//putMessage('Token found: Type(string) at line '+line);
 				//create string type Token
 				tokens.push(new token('Type','String',line));
 				break;
 			case 28:
-			ct=i+1;
+			ct=pos+1;
 				resetState();
 				//putMessage('Token found: Type(boolean)');
 				//create boolean type Token
 				tokens.push(new token('Type','Boolean',line));
 				break;
 			case 32:
-			ct=i+1;
+			ct=pos+1;
 				resetState();
 				//putMessage('Token found: Boolean Value(true)');
 				//create True BoolVal Token
 				tokens.push(new token('Boolean Value','True',line));
 				break;
 			case 37:
-			ct=i+1;
+			ct=pos+1;
 				resetState();
 				//putMessage('Token found: Boolean Value('+input.charAt(i)+') at line '+line);
 				//create False BoolVal Token
-				tokens.push(new token('Type','False',line));
+				tokens.push(new token('Boolean Value','False',line));
 				break;
 			case 39:
-			ct=i+1;
+			ct=pos+1;
 				resetState();
 				//putMessage('Token found: Inequality(!=) at line '+line);
 				tokens.push(new token('Inequality','!=',line));
 				//create inequality Token
 				break;
 			case 40:
-			ct=i+1;
+			ct=pos+1;
 				//Need to check for this case because == has same initial input as =
-				if(lookAhead(input,i,1)=='='){
+				if(checkNextChar(input,pos,1)=='='){
 					return;
 				}else{
 					resetState();
@@ -284,14 +284,14 @@
 				}
 				break;
 			case 41:
-			ct=i+1;
+			ct=pos+1;
 				resetState();
 				//putMessage('Token found: Equality(==) at line '+line);
 				//create equality Token
 				tokens.push(new token('Equality','==',line));
 				break;
 			case 42:
-			ct=i+1;
+			ct=pos+1;
 			//putMessage("at state 42: "+inString);
 				if(!inString){
 					//resetState();
@@ -303,14 +303,14 @@
 				}else if(inString){
 					//st=st+input.charAt(i);
 					//putMessage("String:"+st);
-					tokens.push(new token('String Char',input.charAt(i),line));
+					tokens.push(new token('String Char',input.charAt(pos),line));
 				}else{
 					//console.log(st);
 					return;
 				}
 				break;
 			case 43:
-			ct=i+1;
+			ct=pos+1;
 				inString=false;
 				resetState();
 				//putMessage('Token found: String at line '+line);
@@ -320,56 +320,56 @@
 				tokens.push(new token('Quote','"',line));
 				break;
 			case 44:
-			ct=i+1;
+			ct=pos+1;
 				resetState();
 				//putMessage('Token found: Digit('+i+') at line '+line);
 				//create Digit token
-				tokens.push(new token('Digit',input.charAt(i),line));
+				tokens.push(new token('Digit',input.charAt(pos),line));
 				break;
 			case 45:
-			ct=i+1;
+			ct=pos+1;
 				resetState();
 				//putMessage('Token found: Integer Operator(+) at line '+line);
 				//create Integer Operator Token
-				tokens.push(new token('Intop',input.charAt(i),line));
+				tokens.push(new token('IntOp',input.charAt(pos),line));
 				break;
 			case 46:
-			ct=i+1;
+			ct=pos+1;
 				resetState();
 				//putMessage('Token found: Left Bracket("{") at line '+line);
 				//create Left Bracket Token
-				tokens.push(new token('LeftBracket',input.charAt(i),line));
+				tokens.push(new token('LeftBracket',input.charAt(pos),line));
 				break;
 			case 47:
-			ct=i+1;
+			ct=pos+1;
 				resetState();
 				//putMessage('Token found: Right Bracket("}") at line '+line);
 				//create Right Bracket Token
-				tokens.push(new token('RightBracket',input.charAt(i),line));
+				tokens.push(new token('RightBracket',input.charAt(pos),line));
 				break;
 			case 48:
-			ct=i+1;
+			ct=pos+1;
 				resetState();
 				//putMessage('Token found: Left Parenthesis("(") at line '+line);
 				//create Left Parenthesis Token
-				tokens.push(new token('LeftParen',input.charAt(i),line));
+				tokens.push(new token('LeftParen',input.charAt(pos),line));
 				break;
 			case 49:
-			ct=i+1;
+			ct=pos+1;
 				resetState();
 				//putMessage('Token found: Right Parenthesis(")") at line '+line);
 				//create right Parenthesis Token
-				tokens.push(new token('RightParen',input.charAt(i),line));
+				tokens.push(new token('RightParen',input.charAt(pos),line));
 				break;
 			case 50:
-			ct=i+1;
+			ct=pos+1;
 				resetState();
 				//putMessage('Token found: EOF($) at line '+line);
 				//create EOF Token
-				tokens.push(new token('EOF',input.charAt(i),line));
+				tokens.push(new token('EOF',input.charAt(pos),line));
 				break;
 			case 51:
-				while(ct<i){
+				while(ct<pos){
 					tokens.push(new token('Identifier',input.charAt(ct),line));
 					ct++;
 					//putMessage("ct(52): "+ct);
@@ -377,12 +377,12 @@
 				//putMessage("Over here! "+input.charAt(ct));
 				resetState();  
 				//decriement i to take in the current char again to properly reset
-				i=i-1;
+				pos=pos-1;
 				break;
 			default:
 				//if EOF add ids for all indexes from ct to end
-				if(lookAhead(input,i,1)==''){
-					while(ct<i+1){
+				if(checkNextChar(input,pos,1)==''){
+					while(ct<pos+1){
 						tokens.push(new token('Identifier',input.charAt(ct),line));
 						ct++;
 						//putMessage("ct(def): "+ct);

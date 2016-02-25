@@ -7,97 +7,118 @@ function parse(){
         // Report the results.
         putMessage("Parsing found " + errorCount + " error(s).");        
     }//eo parse
-	function checkToken(expectedKind) {
-        // Validate that we have the expected token kind and et the next token.
-        switch(expectedKind) {
-            case "digit":   putMessage("Expecting a digit");
-                            if (currentToken=="0" || currentToken=="1" || currentToken=="2" || 
-                                currentToken=="3" || currentToken=="4" || currentToken=="5" || 
-                                currentToken=="6" || currentToken=="7" || currentToken=="8" || 
-                                currentToken=="9")
-                            {
-                                putMessage("Got a digit!");
-                            }
-                            else
-                            {
-                                errorCount++;
-                                putMessage("NOT a digit.  Error at position " + tokenIndex + ".");
-                            }
-                            break;
-            case "op":      putMessage("Expecting an operator");
-                            if (currentToken=="+" || currentToken=="-")
-                            {
-                                putMessage("Got an operator!");
-                            }
-                            else
-                            {
-                                errorCount++;
-                                putMessage("NOT an operator.  Error at position " + tokenIndex + ".");
-                            }
-                            break;
-            default:        putMessage("Parse Error: Invalid Token Type at position " + tokenIndex + ".");
-                            break;			
-        }
-        // Consume another token, having just checked this one, because that 
-        // will allow the code to see what's coming next... a sort of "look-ahead".
-        currentToken = getNextToken();
-    }
-
+	function lookAhead(){
+		var x= tokenIndex+1;
+        var thisToken;
+		thisToken = tokens[x];
+        return thisToken;
+	}//eo lookAhead
     function getNextToken() {
         var thisToken = EOF;    // Let's assume that we're at the EOF.
         if (tokenIndex < tokens.length){
             // If we're not at EOF, then return the next token in the stream and advance the index.
             thisToken = tokens[tokenIndex];
-            putMessage("Current token:" + thisToken.val);
+            putMessage("Current token:" + thisToken.val+" :" +thisToken.printMe());
             tokenIndex++;
         }
         return thisToken;
     }//eo getNextToken()
-	function match(st){
-		putMessage("Expecting: " +st);
-		if(currentToken.val==st){
-			putMessage('Got: '+st);
-		}else{
-			errorCount++;
-            putMessage("Error at position " + tokenIndex + ": Got "+"st");
-		}
-		currentToken = getNextToken();
+	function match(st,matchOn){
+		switch(matchOn){
+			case 0:
+				putMessage("Expecting: " +st);
+				if(currentToken.val==st){
+					putMessage('Got: '+currentToken.val);
+				}else{
+					errorCount++;
+					putMessage("Error at position " + tokenIndex + ": Got "+currentToken.printMe());
+				}
+				currentToken = getNextToken();
+				break;
+			case 1:
+				putMessage("Expecting Type: " +st);
+				if(currentToken.type==st){
+					putMessage('Got Type: '+currentToken.type);
+				}else{
+					errorCount++;
+					putMessage("Error at position " + tokenIndex + ": Got type "+currentToken.printMe());
+				}
+				currentToken = getNextToken();
+				break;
+		}//eo switch
 	}//eo match
 	//////////////Non-Terminals/////////////////
     function parseProgram(){
 		//program can be a block followed by EOP($)
 		parseBlock();
-		match('$');
+		match('$',0);
+		if(tokenIndex<tokens.length){
+			parseProgram();
+		}
 	}//eo parseProgram
 	function parseBlock(){
 		//{StatementList}
-		match('{');
+		match('{',0);
 		parseStatementList();
-		match('}');
+		match('}',0);
 	}//eo parseBlock
 	function parseStatementList(){
 		//statement statementlist
 		//empty string
+		if(currentToken.type=='Keyword'||currentToken.type=='Identifier'||currentToken.type=='Type'||currentToken.type=='LeftBracket'){
+			parseStatement();
+			parseStatementList();
+		}else{
+			//do nothing
+			return;
+		}//eo if
+
 	}//eo parseStatementList
 	function parseStatement(){
-		//printStmt
-		//assigmentStmt
-		//varDecl
-		//whileStmt
-		//ifStmt
-		//blockStmt
+		var tokenType=currentToken.type;
+		switch(tokenType){
+			case 'Keyword':
+				if(currentToken.val=='Print'){
+					//printStmt
+					parsePrintStmt();
+				}else if(currentToken.val=='If'){
+					//ifStmt
+					parseIfStmt();
+				}else if(currentToken.val=='While'){
+					//whileStmt
+					parseWhileStmt();
+				}else{
+					 putMessage("Parser Encountered an error on token "+tokenIndex);
+				}//eo else if
+				break;
+			case 'Identifier':
+				parseAssignmentStmt();
+				//assigmentStmt
+				break;
+			case 'Type':
+				parseVarDecl();
+				//varDecl
+				break;
+			case 'LeftBracket':
+				parseBlock();
+				//blockStmt
+				break;
+			default:
+				putMessage("Parser Encountered an error on token "+tokenIndex);
+				break;
+		}//eo switch case
 	}//eo parseStatement
 	function parsePrintStmt(){
 		//print (expr)
-		match('print');
-		match('(');
+		match('Print',0);
+		match('(',0);
 		parseExpr();
-		match(')');
+		match(')',0);
 	}//eo parsePrintStmt
 	function parseAssignmentStmt(){
 		//Id = expr
 		parseId();
-		match('=');
+		match('=',0);
 		parseExpr();
 	}//eo parseAssignmentStmt
 	function parseVarDecl(){
@@ -107,95 +128,135 @@ function parse(){
 	}//eo parseVarDecl
 	function parseWhileStmt(){
 		//while BooleanExpr Block
-		match('while');
+		match('While',0);
 		parseBooleanExpr();
 		parseBlock();
 	}//eo parseWhileStmt
 	function parseIfStmt(){
 		//if BooleanExpr Block
-		match('if');
+		match('If',0);
 		parseBooleanExpr();
 		parseBlock();
 	}//eo parseIfStmt
 	function parseExpr(){
-		//intExpr
-		//stringExpr
-		//booleanExpr
-		//IdExpr
+		switch(currentToken.type){
+			case 'Digit':
+				parseIntExpr();
+				//intExpr
+				break;
+			case 'Quote':
+				parseStringExpr();
+				//StringExpr
+				break;
+			case 'LeftParen':
+				parseBooleanExpr();
+				//booleanExpr
+				break;
+			case 'Boolean Value':
+				parseBooleanExpr();
+				//booleanExpr
+				break;
+			case 'Identifier':
+				parseId();
+				//IdExpr
+				break;
+			default:
+				putMessage("Parser Encountered an error on token "+tokenIndex);
+				break;
+		}
 	}//eo parseExpr
 	function parseIntExpr(){
 		//digit intOp Expr
+		parseDigit();
+		if(currentToken.val=='+'){
+			parseIntOp();
+			parseExpr();
+		}
 		//digit
 	}//eo parseIntExpr
 	function parseStringExpr(){
-		match('\"');
+		match('\"',0);
 		parseCharList();
-		match('\"');
+		match('\"',0);
 	}//eo parseStringExpr
-	function parseBoolExpr(){
+	function parseBooleanExpr(){
 		//(Expr boolOp Expr)
-		match('(');
-		parseExpr();
-		parseBoolOp();
-		parseExpr();
-		parseBoolVal();
-		match(')');
+		if(currentToken.val=='('){
+			match('(',0);
+			parseExpr();
+			parseBoolOp();
+			parseExpr();
+			match(')',0);
+		}else{
+			//boolVal
+			parseBoolVal();
+		}
 	}//eo parseBoolExpr
 	function parseId(){
+		match('Identifier',1);
 		//char
 		//match Char
 	}//eo parseId
 	function parseCharList(){
-		//match char
-		//match space
+		if(currentToken.type=='Quote'){
 		//empty 
+		//do nothing
+			return;
+		}else{
+			parseChar();
+		}
 		parseCharList();
-		
 	}//eo parseCharList()
 	function parseType(){
-		//int
-		//string
-		//boolean
+		switch(currentToken.val){
+			case 'Int':
+				match('Int',0);
+				break;
+				//int
+			case 'String':
+				//string
+				match('String',0);
+				break;
+			case 'Boolean':
+				match('Boolean',0);
+				break;
+				//boolean
+			default:
+				putMessage("Parser Encountered an error on token "+tokenIndex);
+		}
 	}//eo parseType
 	//////////////EO Non-Terminals//////////////////
 	//terminals
 	function parseChar(){
-		
+		if(isLetter(currentToken.val)){
+			//match char
+			//match space
+			match('String Char',1);
+		}else if(!isLetter(currentToken.val)){
+			putMessage("Parse Error invalid string character: "+ currentToken.val);
+		}else{
+			putMessage("Parser Encountered an error on token "+tokenIndex);
+		}
 	}//eo parseChar
-	function parseSpace(){
-		
-	}//eo parseSpace???
 	function parseDigit(){
-		
+		match('Digit',1);
 	}//eo parseDigit
 	function parseBoolOp(){
-		
+		if(currentToken.type=='Equality'){
+			match('==',0);
+		}else if(currentToken.type=='Inequality'){
+			match('!=',0);
+		}
 	}//eo parseBoolOp
 	function parseBoolVal(){
-		match('false');
-		match('true')
+		if(currentToken.val=='False'){
+			match('False',0);
+		}else if(currentToken.val=='True'){
+			match('True',0);
+		}
 	}//eo parseBoolVal
 	function parseIntOp(){
-		match('+');
+		if(currentToken.val=='+'){
+			match('+',0);
+		}
 	}//eo parseIntOp
-	//ALAN'S PARSE
-    function parseG() {
-        // A G(oal) production can only be an E(xpression), so parse the E production.
-        parseE();
-    }
-	//////////EO Terminals///////////////
-    function parseE() {
-        // All E productions begin with a digit, so make sure that we have one.
-        checkToken("digit");
-        // Look ahead 1 char (which is now in currentToken because checkToken 
-        // consumes another one) and see which E production to follow.
-        if (currentToken != EOF) {
-            // We're not done, we we expect to have an op.
-            checkToken("op");
-            parseE();
-        } else {
-            // There is nothing else in the token stream, 
-            // and that's cool since E --> digit is valid.
-            putMessage("EOF reached");
-        }
-    }

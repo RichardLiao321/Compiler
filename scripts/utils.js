@@ -43,7 +43,7 @@ function rot13(str)     // An easy-to understand implementation of the famous an
     return retVal;
 }
 //simple function that returns a substring. Intended for looking ahead for context.
-function lookAhead(str, start, num){
+function checkNextChar(str, start, num){
 	var input = str;
 	var x=start+1;
 	var y=num;
