@@ -1,11 +1,11 @@
 function parse(){
-        putMessage("--------Parsing!-------");
+        putMessage("--------Parsing!-------",0);
         // Grab the next token.
         currentToken = getNextToken();
         // A valid parse derives the PROGRAM production, so begin there.
         parseProgram();
         // Report the results.
-        putMessage("Parsing found " + errorCount + " error(s).");        
+        putMessage("Parsing found " + errorCount + " error(s).",0);        
     }//eo parse
 	function lookAhead(){
 		var x= tokenIndex+1;
@@ -18,30 +18,31 @@ function parse(){
         if (tokenIndex < tokens.length){
             // If we're not at EOF, then return the next token in the stream and advance the index.
             thisToken = tokens[tokenIndex];
-            putMessage("Current token:" + thisToken.val+" :" +thisToken.printMe());
+            putMessage("Current token:" + thisToken.val+" :" +thisToken.printMe(),1);
             tokenIndex++;
         }
         return thisToken;
     }//eo getNextToken()
 	function match(st,matchOn){
+		var errorMsg="Error at position " + tokenIndex + ": Got "+currentToken.printMe()
 		switch(matchOn){
 			case 0:
-				putMessage("Expecting: " +st);
+				putMessage("Expecting: " +st,1);
 				if(currentToken.val==st){
-					putMessage('Got: '+currentToken.val);
+					putMessage('Got: '+currentToken.val,1);
 				}else{
 					errorCount++;
-					putMessage("Error at position " + tokenIndex + ": Got "+currentToken.printMe());
+					putMessage(errorMsg,1);
 				}
 				currentToken = getNextToken();
 				break;
 			case 1:
-				putMessage("Expecting Type: " +st);
+				putMessage("Expecting Type: " +st,1);
 				if(currentToken.type==st){
-					putMessage('Got Type: '+currentToken.type);
+					putMessage('Got Type: '+currentToken.type,1);
 				}else{
 					errorCount++;
-					putMessage("Error at position " + tokenIndex + ": Got type "+currentToken.printMe());
+					putMessage(errorMsg,1);
 				}
 				currentToken = getNextToken();
 				break;
@@ -87,8 +88,6 @@ function parse(){
 				}else if(currentToken.val=='While'){
 					//whileStmt
 					parseWhileStmt();
-				}else{
-					 putMessage("Parser Encountered an error on token "+tokenIndex);
 				}//eo else if
 				break;
 			case 'Identifier':
@@ -104,7 +103,7 @@ function parse(){
 				//blockStmt
 				break;
 			default:
-				putMessage("Parser Encountered an error on token "+tokenIndex);
+				putMessage("Parser Encountered an error on token "+tokenIndex,0);
 				break;
 		}//eo switch case
 	}//eo parseStatement
@@ -161,7 +160,7 @@ function parse(){
 				//IdExpr
 				break;
 			default:
-				putMessage("Parser Encountered an error on token "+tokenIndex);
+				putMessage("Parser Encountered an error on token "+tokenIndex,0);
 				break;
 		}
 	}//eo parseExpr
@@ -222,7 +221,7 @@ function parse(){
 				break;
 				//boolean
 			default:
-				putMessage("Parser Encountered an error on token "+tokenIndex);
+				putMessage("Parser Encountered an error on token "+tokenIndex,0);
 		}
 	}//eo parseType
 	//////////////EO Non-Terminals//////////////////
@@ -233,9 +232,9 @@ function parse(){
 			//match space
 			match('String Char',1);
 		}else if(!isLetter(currentToken.val)){
-			putMessage("Parse Error invalid string character: "+ currentToken.val);
+			putMessage("Parse Error invalid string character: "+ currentToken.val,0);
 		}else{
-			putMessage("Parser Encountered an error on token "+tokenIndex);
+			putMessage("Parser Encountered an error on token "+tokenIndex,0);
 		}
 	}//eo parseChar
 	function parseDigit(){

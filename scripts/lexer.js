@@ -142,10 +142,10 @@
         //Trim the leading and trailing spaces.
         sourceCode = trim(sourceCode);
 		//sourceCode = sourceCode.replace(/(\r\n|\n|\r)/gm,"");
-		putMessage("--------Lexing!-------");
-		putMessage('Lexing String: '+sourceCode);
+		putMessage("--------Lexing!-------",0);
+		putMessage('Lexing String: '+sourceCode,0);
 		if(sourceCode.charAt(sourceCode.length-1)!='$'){
-			putMessage('Warning No EOF character($) found...');
+			putMessage('Warning No EOF character($) found...',1);
 			sourceCode=sourceCode+'$';
 		}
 		process(sourceCode);
@@ -180,7 +180,7 @@
 					state=51;
 				}//eo try catch
 			}else{
-				putMessage("Invalid input: "+str.charAt(pos));
+				putMessage("Invalid input: "+str.charAt(pos),1);
 				return;
 			}//eo if
 			pos++;
@@ -193,13 +193,13 @@
 	function checkState(string,lineNum){
 		var input=string;
 		var line=lineNum;
-		//putMessage("checking state: "+state);
+		putMessage("checking state: "+state,1);
 		//putMessage("ct: "+ct);
 		switch(state) {
 			case 5:
 			ct=pos+1;
 				resetState();
-				//putMessage('Token found: Print');
+				putMessage('Token found: Print at line '+line,1);
 				//create Print Token
 				tokens.push(new token('Keyword','Print',line));
 				//tokens.push(x);
@@ -207,7 +207,7 @@
 			case 10:
 			ct=pos+1;
 				resetState();
-				//putMessage('Token found: While');
+				putMessage('Token found: While '+line,1);
 				//create While Token
 				//var x = new token('While',null,line);
 				tokens.push(new token('Keyword','While',line));
@@ -215,7 +215,7 @@
 			case 12:
 			ct=pos+1;
 				resetState();
-				//putMessage('Token found: If at line '+line);
+				putMessage('Token found: If at line '+line,1);
 				//create if Token
 				//var x = new token('If',null,line);
 				tokens.push(new token('Keyword','If',line));
@@ -223,14 +223,14 @@
 			case 14:
 			ct=pos+1;
 				resetState();
-				//putMessage('Token found: Type(int) at line '+line);
+				putMessage('Token found: Type(int) at line '+line,1);
 				//create type Token
 				//var x = new token('Type','int',line);
 				tokens.push(new token('Type','Int',line));
 				break;
  			case 15:
 				resetState();
-				//putMessage('Token found: Identifier('+input.charAt(i)+') at line '+line);
+				putMessage('Token found: Identifier('+input.charAt(pos)+') at line '+line,1);
 				//create identifier Token
 				//var x = new token('Identifier',input.charAt(i),line);
 				tokens.push(new token('Identifier',input.charAt(pos),line));
@@ -239,35 +239,35 @@
 			case 21:
 			ct=pos+1;
 				resetState();
-				//putMessage('Token found: Type(string) at line '+line);
+				putMessage('Token found: Type(string) at line '+line,1);
 				//create string type Token
 				tokens.push(new token('Type','String',line));
 				break;
 			case 28:
 			ct=pos+1;
 				resetState();
-				//putMessage('Token found: Type(boolean)');
+				putMessage('Token found: Type(boolean) at line '+line,1);
 				//create boolean type Token
 				tokens.push(new token('Type','Boolean',line));
 				break;
 			case 32:
 			ct=pos+1;
 				resetState();
-				//putMessage('Token found: Boolean Value(true)');
+				putMessage('Token found: Boolean Value(true) at line '+line,1);
 				//create True BoolVal Token
 				tokens.push(new token('Boolean Value','True',line));
 				break;
 			case 37:
 			ct=pos+1;
 				resetState();
-				//putMessage('Token found: Boolean Value('+input.charAt(i)+') at line '+line);
+				putMessage('Token found: Boolean Value(false) at line '+line,1);
 				//create False BoolVal Token
 				tokens.push(new token('Boolean Value','False',line));
 				break;
 			case 39:
 			ct=pos+1;
 				resetState();
-				//putMessage('Token found: Inequality(!=) at line '+line);
+				putMessage('Token found: Inequality(!=) at line '+line,1);
 				tokens.push(new token('Inequality','!=',line));
 				//create inequality Token
 				break;
@@ -278,7 +278,7 @@
 					return;
 				}else{
 					resetState();
-					//putMessage('Token found: Assignment(=) at line '+line);
+					putMessage('Token found: Assignment(=) at line '+line,1);
 					//create Assignment Token
 					tokens.push(new token('Assignment','=',line));
 				}
@@ -286,7 +286,7 @@
 			case 41:
 			ct=pos+1;
 				resetState();
-				//putMessage('Token found: Equality(==) at line '+line);
+				putMessage('Token found: Equality(==) at line '+line,1);
 				//create equality Token
 				tokens.push(new token('Equality','==',line));
 				break;
@@ -295,14 +295,14 @@
 			//putMessage("at state 42: "+inString);
 				if(!inString){
 					//resetState();
-					//putMessage('Token found: Quote(") at line '+line);
+					putMessage('Token found: Quote(") at line '+line,1);
 					//st="";
 					inString=true;
 					//create " Token
 					tokens.push(new token('Quote','"',line));
 				}else if(inString){
 					//st=st+input.charAt(i);
-					//putMessage("String:"+st);
+					putMessage('Token found: String Char('+input.charAt(pos)+') at line '+line,1);
 					tokens.push(new token('String Char',input.charAt(pos),line));
 				}else{
 					//console.log(st);
@@ -313,7 +313,7 @@
 			ct=pos+1;
 				inString=false;
 				resetState();
-				//putMessage('Token found: String at line '+line);
+				putMessage('Token found: String at line '+line,1);
 				//create " Token
 				/* tokens.push(new token('String',st,line));
 				st=""; */
@@ -322,55 +322,58 @@
 			case 44:
 			ct=pos+1;
 				resetState();
-				//putMessage('Token found: Digit('+i+') at line '+line);
+				putMessage('Token found: Digit('+input.charAt(pos)+') at line '+line,1);
 				//create Digit token
 				tokens.push(new token('Digit',input.charAt(pos),line));
 				break;
 			case 45:
 			ct=pos+1;
 				resetState();
-				//putMessage('Token found: Integer Operator(+) at line '+line);
+				putMessage('Token found: Integer Operator(+) at line '+line,1);
 				//create Integer Operator Token
 				tokens.push(new token('IntOp',input.charAt(pos),line));
 				break;
 			case 46:
 			ct=pos+1;
 				resetState();
-				//putMessage('Token found: Left Bracket("{") at line '+line);
+				putMessage('Token found: Left Bracket("{") at line '+line,1);
 				//create Left Bracket Token
 				tokens.push(new token('LeftBracket',input.charAt(pos),line));
 				break;
 			case 47:
 			ct=pos+1;
 				resetState();
-				//putMessage('Token found: Right Bracket("}") at line '+line);
+				putMessage('Token found: Right Bracket("}") at line '+line,1);
 				//create Right Bracket Token
 				tokens.push(new token('RightBracket',input.charAt(pos),line));
 				break;
 			case 48:
 			ct=pos+1;
 				resetState();
-				//putMessage('Token found: Left Parenthesis("(") at line '+line);
+				putMessage('Token found: Left Parenthesis("(") at line '+line,1);
 				//create Left Parenthesis Token
 				tokens.push(new token('LeftParen',input.charAt(pos),line));
 				break;
 			case 49:
 			ct=pos+1;
 				resetState();
-				//putMessage('Token found: Right Parenthesis(")") at line '+line);
+				putMessage('Token found: Right Parenthesis(")") at line '+line,1);
 				//create right Parenthesis Token
 				tokens.push(new token('RightParen',input.charAt(pos),line));
 				break;
 			case 50:
 			ct=pos+1;
 				resetState();
-				//putMessage('Token found: EOF($) at line '+line);
+				putMessage('Token found: EOF($) at line '+line,1);
 				//create EOF Token
 				tokens.push(new token('EOF',input.charAt(pos),line));
 				break;
 			case 51:
 				while(ct<pos){
-					tokens.push(new token('Identifier',input.charAt(ct),line));
+					if(isLetter(input.charAt(ct))){
+						putMessage('Token found: Identifier('+input.charAt(ct)+') at line '+line,1)
+						tokens.push(new token('Identifier',input.charAt(ct),line));
+					}
 					ct++;
 					//putMessage("ct(52): "+ct);
 				}
@@ -383,7 +386,10 @@
 				//if EOF add ids for all indexes from ct to end
 				if(checkNextChar(input,pos,1)==''){
 					while(ct<pos+1){
-						tokens.push(new token('Identifier',input.charAt(ct),line));
+						if(isLetter(input.charAt(ct))){
+							putMessage('Token found: Identifier('+input.charAt(ct)+') at line '+line,1)
+							tokens.push(new token('Identifier',input.charAt(ct),line));
+						}
 						ct++;
 						//putMessage("ct(def): "+ct);
 					}

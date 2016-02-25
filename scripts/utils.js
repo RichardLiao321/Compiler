@@ -3,7 +3,9 @@
 
    Utility functions.
    -------- */
-
+function myEvent(){
+	console.log("hello!");
+}
 function trim(str)      // Use a regular expression to remove leading and trailing spaces.
 {
 	return str.replace(/^\s+ | \s+$/g, "");

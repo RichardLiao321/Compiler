@@ -1,13 +1,18 @@
 <!DOCTYPE HTML>
 <html>
 <head>
-    <title>My Compiler</title>
+    <title>Compiler TM90C</title>
     <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
     <!--<link rel="stylesheet" type="text/css" href="compiler.css" />-->
 	<link href="bootstrap.css" rel="stylesheet"><!--The magic happens here-->
 </head>
 <body onload="init();">
-    <h1><img src="img/test/new2.gif">Richard Liao's Compiler Project: The most 90's Compiler yet<img src="img/test/new2.gif"></h1>
+    <h1><img src="img/test/new2.gif">The Most 90's Compiler<img src="img/test/new2.gif">	
+        <img src="img/test/yahooweek.gif">
+        <img src="img/test/community.gif">
+        <img src="img/test/wabwalk.gif">
+        <img src="img/test/webtrips.gif">
+    </h1>
 	<!-- Accolades part 1: The Reckoning **NOTE: Accolades may or may not be completely fabricated-->
 	<div>
 		<marquee scrollamount="15">
@@ -30,20 +35,38 @@
 	<p>
 		<em>"I'm not changing it." -Richard Liao</em>
     </p>
+	<!--Nav-->
+	<div class="subnav">
+		<ul class="nav nav-pills">
+		  <li class="active"><a href="#javascript:myJsFunc();">Program 1</a></li>
+		  <li class=""><a href="javascript:;" onclick="myEvent()">Program 2</a></li>
+		  <li class=""><a href="javascript:;" onclick="myEvent()"><img class="pull-left" style="margin-top: -5px" src="img/test/hot.gif">Program 3</a></li>
+		  <li class=""><a href="javascript:;" onclick="myEvent()">Program 4</a></li>
+		  <li class=""><a href="javascript:;" onclick="myEvent()">Program 5</a></li>
+		  <li class=""><a href="javascript:;" onclick="myEvent()"><img class="pull-left" style="margin-top: -3px" src="img/test/new.gif">Incorrect Program 1</a></li>
+		</ul>
+	</div>
     <div style="float:left">
         <textarea id="taSourceCode" rows="18"></textarea>
         <br>
+		<div>
         <button id="btnCompile" onclick="btnCompile_click();"><img src="img/test/hot.gif">Compile<img src="img/test/hot.gif"></button>
+		</div>
     </div>
 	<div>
 		<textarea style="width:500px" id="taOutput" rows="18"></textarea>
+		
+		<form id='verbose'>
+			<input id='verboseOn' name="verboseMode" type="radio" checked="checked" >Verbose On<br>
+			<input id='verboseOff'name="verboseMode" type="radio" >Verbose Off<br>
+		</form>
 	</div>
     <!-- Footer -->
 	<br>
 	<br>
 	<p>
 		<address>
-			<strong>Lost your eye sight? Want to complain?</strong>
+			<strong><img src="img/test/spinningearth.gif" width="26">Lost your eye sight? Want to complain?</strong>
 			<br>
 			<a href="">
 				<img src="img/test/emailme.gif" alt="Valid HTML5" width="88" height="31" />
@@ -88,7 +111,7 @@
         // "compile" button between the two text areas, above.  
         // Note the <input> element's event handler: onclick="btnCompile_click();
         init();
-        putMessage("Compilation Started");
+        putMessage("Compilation Started",0);
         // Grab the tokens from the lexer . . .
         tokens = lex();
         //putMessage("Lex returned [" + tokens + "]");
@@ -97,8 +120,14 @@
 		
     }
     
-    function putMessage(msg) {
-        document.getElementById("taOutput").value += msg + "\n";
+    function putMessage(msg,verbose) {
+	//1 = verbose mode on
+		if(document.getElementById("verboseOn").checked==true){
+			document.getElementById("taOutput").value += msg + "\n";
+		}else if(document.getElementById("verboseOff").checked==true &&verbose==0){
+			document.getElementById("taOutput").value += msg + "\n";
+		}
+	//0 = verbose mode off
     }
     </script>
 </body>
