@@ -24,29 +24,33 @@ function parse(){
         return thisToken;
     }//eo getNextToken()
 	function match(st,matchOn){
-		var errorMsg="Error at position " + tokenIndex + ": Got "+currentToken.printMe()
-		switch(matchOn){
-			case 0:
-				putMessage("Expecting: " +st,1);
-				if(currentToken.val==st){
-					putMessage('Got: '+currentToken.val,1);
-				}else{
-					errorCount++;
-					putMessage(errorMsg,1);
-				}
-				currentToken = getNextToken();
-				break;
-			case 1:
-				putMessage("Expecting Type: " +st,1);
-				if(currentToken.type==st){
-					putMessage('Got Type: '+currentToken.type,1);
-				}else{
-					errorCount++;
-					putMessage(errorMsg,1);
-				}
-				currentToken = getNextToken();
-				break;
-		}//eo switch
+		var errorMsg="Error at position " + tokenIndex + ": Got "+currentToken.printMe();
+		if(tokenIndex < tokens.length){
+			switch(matchOn){
+				case 0:
+					putMessage("Expecting: " +st,1);
+					if(currentToken.val==st){
+						putMessage('Got: '+currentToken.val,1);
+					}else{
+						errorCount++;
+						putMessage(errorMsg,1);
+					}
+					currentToken = getNextToken();
+					break;
+				case 1:
+					putMessage("Expecting Type: " +st,1);
+					if(currentToken.type==st){
+						putMessage('Got Type: '+currentToken.type,1);
+					}else{
+						errorCount++;
+						putMessage(errorMsg,1);
+					}
+					currentToken = getNextToken();
+					break;
+			}//eo switch
+		}else{
+			return
+		}//eo if
 	}//eo match
 	//////////////Non-Terminals/////////////////
     function parseProgram(){
@@ -103,6 +107,7 @@ function parse(){
 				//blockStmt
 				break;
 			default:
+				errorCount++;
 				putMessage("Parser Encountered an error on token "+tokenIndex,0);
 				break;
 		}//eo switch case
@@ -160,6 +165,7 @@ function parse(){
 				//IdExpr
 				break;
 			default:
+				errorCount++;
 				putMessage("Parser Encountered an error on token "+tokenIndex,0);
 				break;
 		}
@@ -220,8 +226,6 @@ function parse(){
 				match('Boolean',0);
 				break;
 				//boolean
-			default:
-				putMessage("Parser Encountered an error on token "+tokenIndex,0);
 		}
 	}//eo parseType
 	//////////////EO Non-Terminals//////////////////
@@ -232,8 +236,10 @@ function parse(){
 			//match space
 			match('String Char',1);
 		}else if(!isLetter(currentToken.val)){
+			errorCount++;
 			putMessage("Parse Error invalid string character: "+ currentToken.val,0);
 		}else{
+			errorCount++;
 			putMessage("Parser Encountered an error on token "+tokenIndex,0);
 		}
 	}//eo parseChar
