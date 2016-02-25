@@ -145,7 +145,8 @@
 		//sourceCode = sourceCode.replace(/(\r\n|\n|\r)/gm,"");
 		putMessage("--------Lexing!-------",0);
 		putMessage('Lexing String: '+sourceCode,1);
-		if(sourceCode.charAt(sourceCode.length)!='$'){
+		//Check for EOF If none then give warning and add it
+		if(sourceCode.slice(-1)!='$'){
 			putMessage('Warning No EOF character($) found...',1);
 			sourceCode=sourceCode+'$';
 		}
@@ -308,7 +309,7 @@
 					tokens.push(new token('Quote','"',line));
 				}else if(inString){
 					//st=st+input.charAt(i);
-					if(isLetter(input.charAt(ct))||input.charAt(ct)==' '){
+					if(isLetter(input.charAt(ct)) || input.indexOf(' ')>=0){
 						putMessage('Token found: String Char('+input.charAt(pos)+') at line '+line,1);
 						tokens.push(new token('String Char',input.charAt(pos),line));
 					}else{
