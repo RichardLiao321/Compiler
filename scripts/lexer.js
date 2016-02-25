@@ -371,7 +371,7 @@
 				break;
 			case 51:
 				while(ct<pos){
-					if(isLetter(input.charAt(ct))){
+					if(isLetter(input.charAt(ct))||input.charAt(ct)==' '){
 						putMessage('Token found: Identifier('+input.charAt(ct)+') at line '+line,1)
 						tokens.push(new token('Identifier',input.charAt(ct),line));
 					}
