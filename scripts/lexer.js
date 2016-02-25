@@ -150,6 +150,7 @@
 		}
 		process(sourceCode);
 		printTokens();
+		putMessage("Lexer Completed",0);
         return tokens;
     }//eo lex
 	
