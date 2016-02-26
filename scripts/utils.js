@@ -64,15 +64,18 @@ function testPrograms(progNo){
             document.getElementById("taSourceCode").value ="{}$";
         }else if(progNo == 2){
             document.getElementById("taSourceCode").value = "";
-            document.getElementById("taSourceCode").value ="{\n\tint a\n\ta = 1\n\n\tint b\n\tb = 2\n\n\ta = b\n\tb = n\n}$";
+            document.getElementById("taSourceCode").value ="{\n\tboolean a\n\ta = 1\n\n\tint b\n\tb = 2\n\n\ta = b\n\tb = n\n}$";
         }else if(progNo == 3){
             document.getElementById("taSourceCode").value = "";
             document.getElementById("taSourceCode").value = "{\n\tint a\n\ta = 1\n\n\tif(a == 1) {\n\t\ta = 2\n\t}\n\n\tif(a != 1) {\n\t\ta = 3\n\t}\n} $";
         }else if(progNo == 4){
             document.getElementById("taSourceCode").value = "";
-            document.getElementById("taSourceCode").value = "{\n\tint x\n\tx = 0\n\n\twhile (x != 5)\n\t{\n\t\tprint(x)\n\t\tx = 1 + x\n\t}\n} $";
+            document.getElementById("taSourceCode").value = "{\n\tint x\n\tx = 0\n\n\twhile (x != 5)\n\t{\n\t\tprint((true==false))\n\t\tx = 1 + x\n\t}\n} $";
         }else if(progNo == 5){
             document.getElementById("taSourceCode").value = "";
             document.getElementById("taSourceCode").value ="{\n\tint x\n\tx = 1\n\n\t{\n\n\t\tint x\n\t\tx = 2\n\t\t{\n\t\t\tx = 5\n\t\t}\n\n\t\tprint(x)\n\t}\n\tprint(x)\n} $";
+        }else if(progNo == 6){
+            document.getElementById("taSourceCode").value = "";
+            document.getElementById("taSourceCode").value ="{\n\tintx\n\tx = 1\n\n\t{\n\n\t\tint x\n\t\tx = 2\n\t\t{\n\t\t\tx = 5\n\t\t}\n\n\t\tprint(x)\n\t}\n\tprint(x)\n \tx=22\n}$";
         }
 }
