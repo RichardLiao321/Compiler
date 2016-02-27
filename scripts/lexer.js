@@ -309,7 +309,7 @@
 					tokens.push(new token('Quote','"',line));
 				}else if(inString){
 					//st=st+input.charAt(i);
-					if(isLetter(input.charAt(ct)) || input.indexOf(' ')>=0){
+					if(isLetter(input.charAt(pos)) || input.charAt(pos)==' '){
 						putMessage('Token found: String Char('+input.charAt(pos)+') at line '+line,1);
 						tokens.push(new token('String Char',input.charAt(pos),line));
 					}else{
