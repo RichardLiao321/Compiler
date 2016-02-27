@@ -231,7 +231,7 @@ function parse(){
 	//////////////EO Non-Terminals//////////////////
 	//terminals
 	function parseChar(){
-		if(isLetter(currentToken.val)){
+		if(isLetter(currentToken.val)||currentToken.val==' '){
 			//match char
 			//match space
 			match('String Char',1);
