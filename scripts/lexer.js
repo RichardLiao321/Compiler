@@ -112,11 +112,11 @@
 /* ERROR  q51*/	[51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51],
 				[51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51 ,51]	
 	];//eo matrix. Ne(m)o not found :(
+	
 	var state;//global DFA position variable
-	//var st="";
-	var inString=false;
-	var ct=0;//left index
-	var pos;//current index
+	var lexErrors = 0;
+	var lexWarnings = 0;
+
 	/*Token Class*/
 	function token(type,val,line){
 		this.type=type;
@@ -149,10 +149,16 @@
 		if(sourceCode.slice(-1)!='$'){
 			putMessage('Warning No EOF character($) found...',1);
 			sourceCode=sourceCode+'$';
+			lexWarnings++;
 		}
+		var inString=false;
+		var ct=0;//left index
+		var pos;//current index
+		lexErrors=0;
+		lexWarnings=0;
 		process(sourceCode);
 		printTokens();
-		putMessage("Lexer Completed",0);
+		putMessage("Lexer Completed with "+lexErrors+" error(s) and "+ lexWarnings+" warning(s)",0);
         return tokens;
     }//eo lex
 	
@@ -160,7 +166,7 @@
 		//DFA State starts at 0
 		state=0;
 		var c=str.charAt(0);
-		var lineNum=1;
+		var line=1;
 		pos=0;
 		//loop through input string
 		while(pos<str.length){
@@ -168,7 +174,7 @@
 			c=get(str.charAt(pos));
 			//increment lineNum for tokens 
 			if(str.charAt(pos)=="\n"){
-				lineNum++;
+				line++;
 			}
 			if(!isNaN(c)){//if charAt(pos) is not mapped, fail
 				putMessage("got char "+str.charAt(pos),1);
@@ -177,25 +183,29 @@
 					state=delta[state][c];
 					//putMessage("moving to state: "+state);
 					//pass string and current position to checkState to check next char in input
-					checkState(str,lineNum);
+					checkState(str,line);
 				}catch(err) {
 					//on err, go to state 51, error state
 					state=51;
 				}//eo try catch
 			}else{
-				putMessage("Invalid input: "+str.charAt(pos),1);
-				return;
+				putMessage("Invalid input: "+str.charAt(pos),0);
+				lexErrors++;
 			}//eo if
 			pos++;
 			//putMessage("i: "+i);
 		}//eo while
-		
+		if(inString==true){
+			putMessage("Error: Unterminated String on line "+line,0);
+			lexErrors++;
+			return;
+		}//eo if
 	}//eo process
 	//Checks the current state for an accept state.
 	//If so, creates the appropriate token and resets the state
-	function checkState(string,lineNum){
+	function checkState(string,line){
 		var input=string;
-		var line=lineNum;
+		//var line=lineNum;
 		putMessage("checking state: "+state,1);
 		//putMessage("ct: "+ct);
 		switch(state) {
@@ -309,15 +319,14 @@
 					tokens.push(new token('Quote','"',line));
 				}else if(inString){
 					//st=st+input.charAt(i);
-					if(isLetter(input.charAt(ct)) || input.indexOf(' ')>=0){
+					if(isLetter(input.charAt(ct)) || input.charAt(ct)==' '){
 						putMessage('Token found: String Char('+input.charAt(pos)+') at line '+line,1);
 						tokens.push(new token('String Char',input.charAt(pos),line));
-					}else{
-						//do nothing if encountering a non-char/space in a string
-						return;
+					}else if(input.charAt(ct)!="\""){
+						
 					}
 				}else{
-					//should never happen
+					//do nothing if encountering a non-char/space in a string
 					return;
 				}
 				break;

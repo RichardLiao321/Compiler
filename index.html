@@ -87,6 +87,7 @@
     <script type="text/javascript" src="scripts/utils.js"></script>	
     <script type="text/javascript" src="scripts/lexer.js"></script>
 	<script type="text/javascript" src="scripts/parse.js"></script>
+	<script type="text/javascript" src="scripts/cstObj.js"></script>
     <script type="text/javascript">
     // Global variables
     var tokens = [];
@@ -94,7 +95,8 @@
     var currentToken = "";
     var errorCount = 0;
     var EOF = "$";
-
+	var CST = new tree();
+	
     function init() {
         // Clear the message box.
         document.getElementById("taOutput").value = "";
@@ -106,6 +108,7 @@
 		inString=false;
 		st="";
 		ct=0;
+		CST = new tree();
     }
     
     function btnCompile_click() {        
@@ -118,8 +121,10 @@
         tokens = lex();
         //putMessage("Lex returned [" + tokens + "]");
         // . . . and parse!
-        parse();
-		
+		if(lexErrors==0){
+			parse();
+			putMessage(CST.toString(),0);
+		}
     }
     
     function putMessage(msg,verbose) {

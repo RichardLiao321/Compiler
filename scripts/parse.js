@@ -8,7 +8,7 @@ function parse(){
         putMessage("Parsing found " + errorCount + " error(s).",0);        
     }//eo parse
 	function lookAhead(){
-		var x= tokenIndex+1;
+		var x = tokenIndex+1;
         var thisToken;
 		thisToken = tokens[x];
         return thisToken;
@@ -24,52 +24,60 @@ function parse(){
         return thisToken;
     }//eo getNextToken()
 	function match(st,matchOn){
-		var errorMsg="Error at position " + tokenIndex + ": Got "+currentToken.printMe();
+		var errorMsg="Error: unable to match at token index:" + tokenIndex;
 		if(tokenIndex < tokens.length){
 			switch(matchOn){
 				case 0:
 					putMessage("Expecting: " +st,1);
 					if(currentToken.val==st){
+						CST.addNode(st,'leaf');
 						putMessage('Got: '+currentToken.val,1);
 					}else{
 						errorCount++;
-						putMessage(errorMsg,1);
+						putMessage(errorMsg,0);
 					}
 					currentToken = getNextToken();
 					break;
 				case 1:
 					putMessage("Expecting Type: " +st,1);
 					if(currentToken.type==st){
+						CST.addNode(currentToken.val,'leaf');
 						putMessage('Got Type: '+currentToken.type,1);
 					}else{
 						errorCount++;
-						putMessage(errorMsg,1);
+						putMessage(errorMsg,0);
 					}
 					currentToken = getNextToken();
 					break;
 			}//eo switch
-		}else{
-			return
+		}else if(tokenIndex >= tokens.length){
+			//do nothing
+			return;
 		}//eo if
 	}//eo match
 	//////////////Non-Terminals/////////////////
     function parseProgram(){
 		//program can be a block followed by EOP($)
+		CST.addNode('root','branch');
 		parseBlock();
 		match('$',0);
 		if(tokenIndex<tokens.length){
 			parseProgram();
 		}
+		CST.endChildren();
 	}//eo parseProgram
 	function parseBlock(){
 		//{StatementList}
+		CST.addNode('block','branch');
 		match('{',0);
 		parseStatementList();
 		match('}',0);
+		CST.endChildren();
 	}//eo parseBlock
 	function parseStatementList(){
 		//statement statementlist
 		//empty string
+		CST.addNode('statement list','branch');
 		if(currentToken.type=='Keyword'||currentToken.type=='Identifier'||currentToken.type=='Type'||currentToken.type=='LeftBracket'){
 			parseStatement();
 			parseStatementList();
@@ -77,9 +85,10 @@ function parse(){
 			//do nothing
 			return;
 		}//eo if
-
+		CST.endChildren();
 	}//eo parseStatementList
 	function parseStatement(){
+		CST.addNode('statement','branch');
 		var tokenType=currentToken.type;
 		switch(tokenType){
 			case 'Keyword':
@@ -108,41 +117,54 @@ function parse(){
 				break;
 			default:
 				errorCount++;
-				putMessage("Parser Encountered an error on token "+tokenIndex,0);
+				putMessage("Error: unable to parse statement at token index:"+tokenIndex,0);
+				//currentToken = getNextToken();
 				break;
 		}//eo switch case
+		CST.endChildren();
 	}//eo parseStatement
 	function parsePrintStmt(){
+		CST.addNode('print','branch');
 		//print (expr)
 		match('Print',0);
 		match('(',0);
 		parseExpr();
 		match(')',0);
+		CST.endChildren();
 	}//eo parsePrintStmt
 	function parseAssignmentStmt(){
+		CST.addNode('assignment','branch');
 		//Id = expr
 		parseId();
 		match('=',0);
 		parseExpr();
+		CST.endChildren();
 	}//eo parseAssignmentStmt
 	function parseVarDecl(){
+		CST.addNode('vardecl','branch');
 		//type Id
 		parseType();
 		parseId();
+		CST.endChildren();
 	}//eo parseVarDecl
 	function parseWhileStmt(){
+		CST.addNode('while','branch');
 		//while BooleanExpr Block
 		match('While',0);
 		parseBooleanExpr();
 		parseBlock();
+		CST.endChildren();
 	}//eo parseWhileStmt
 	function parseIfStmt(){
+		CST.addNode('if','branch');
 		//if BooleanExpr Block
 		match('If',0);
 		parseBooleanExpr();
 		parseBlock();
+		CST.endChildren();
 	}//eo parseIfStmt
 	function parseExpr(){
+		CST.addNode('Expr','branch');
 		switch(currentToken.type){
 			case 'Digit':
 				parseIntExpr();
@@ -166,25 +188,31 @@ function parse(){
 				break;
 			default:
 				errorCount++;
-				putMessage("Parser Encountered an error on token "+tokenIndex,0);
+				putMessage("Error: unable to parse expr at token index:"+tokenIndex,0);
 				break;
 		}
+		CST.endChildren();
 	}//eo parseExpr
 	function parseIntExpr(){
+		CST.addNode('IntExpr','branch');
 		//digit intOp Expr
 		parseDigit();
 		if(currentToken.val=='+'){
 			parseIntOp();
 			parseExpr();
 		}
+		CST.endChildren();
 		//digit
 	}//eo parseIntExpr
 	function parseStringExpr(){
+		CST.addNode('string','branch');
 		match('\"',0);
 		parseCharList();
 		match('\"',0);
+		CST.endChildren();
 	}//eo parseStringExpr
 	function parseBooleanExpr(){
+		CST.addNode('booleanExpr','branch');
 		//(Expr boolOp Expr)
 		if(currentToken.val=='('){
 			match('(',0);
@@ -196,13 +224,18 @@ function parse(){
 			//boolVal
 			parseBoolVal();
 		}
+		CST.endChildren();
 	}//eo parseBoolExpr
 	function parseId(){
+		CST.addNode('identifier','branch');
 		match('Identifier',1);
 		//char
 		//match Char
+		CST.endChildren();
 	}//eo parseId
 	function parseCharList(){
+		CST.addNode('string char','branch');
+
 		if(currentToken.type=='Quote'){
 		//empty 
 		//do nothing
@@ -210,6 +243,7 @@ function parse(){
 		}else{
 			parseChar();
 		}
+		CST.endChildren();
 		parseCharList();
 	}//eo parseCharList()
 	function parseType(){
@@ -235,12 +269,13 @@ function parse(){
 			//match char
 			//match space
 			match('String Char',1);
-		}else if(!isLetter(currentToken.val)){
-			errorCount++;
-			putMessage("Parse Error invalid string character: "+ currentToken.val,0);
+		}else if(currentToken.val==' '){
+			match('String Char',1);
 		}else{
 			errorCount++;
-			putMessage("Parser Encountered an error on token "+tokenIndex,0);
+			putMessage("Error: Unable to parse char at "+tokenIndex,0);
+			currentToken = getNextToken();
+			return;
 		}
 	}//eo parseChar
 	function parseDigit(){
