@@ -319,11 +319,7 @@
 					tokens.push(new token('Quote','"',line));
 				}else if(inString){
 					//st=st+input.charAt(i);
-<<<<<<< HEAD
 					if(isLetter(input.charAt(ct)) || input.charAt(ct)==' '){
-=======
-					if(isLetter(input.charAt(pos)) || input.charAt(pos)==' '){
->>>>>>> origin/master
 						putMessage('Token found: String Char('+input.charAt(pos)+') at line '+line,1);
 						tokens.push(new token('String Char',input.charAt(pos),line));
 					}else if(input.charAt(ct)!="\""){
