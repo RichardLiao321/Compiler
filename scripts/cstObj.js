@@ -6,7 +6,10 @@
 			var newNode = {
 							name:name,
 							children:[],
-							parent:{}
+							parent:{},
+							printNode:function(){
+								console.log("Children: "+children.toString());
+							}
 			};
 			if((this.root == null) || (!this.root)){//see if we are at root
 				this.root=newNode;
@@ -64,6 +67,7 @@
         }
         // Make the initial call to expand from the root.
         expand(this.root, 0);
+        //console.log("HEY ROOT HERE"+this.root.printNode());
         // Return the result.
         return traversalResult;
     };//eo toString

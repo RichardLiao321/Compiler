@@ -118,13 +118,32 @@
         init();
         putMessage("Compilation Started",0);
         // Grab the tokens from the lexer . . .
-        tokens = lex();
-        //putMessage("Lex returned [" + tokens + "]");
-        // . . . and parse!
-		if(lexErrors==0){
-			parse();
-			putMessage(CST.toString(),0);
-		}
+        var source= document.getElementById("taSourceCode").value;
+        source=source.split('$');
+        console.log(source);
+        for(p = 0; p<source.length-1;p++){
+        	//Vars
+        	tokens = [];
+	        tokenIndex = 0;
+	        currentToken = ' ';
+	        errorCount = 0;
+			inString=false;
+			st="";
+			ct=0;
+			CST = new tree();
+
+        	putMessage("--------Lexing!-------",0);
+        	putMessage("--------Program "+p+"-------",0);
+	        tokens = lex(source[p]);
+	        // . . . and parse!
+			if(lexErrors==0){
+				putMessage("--------Program "+p+"-------",0);
+				parse();
+				putMessage(CST.toString(),0);
+			}//eo if
+			putMessage("******************************************");
+			putMessage("******************************************");
+        }//eo for
     }
     
     function putMessage(msg,verbose) {

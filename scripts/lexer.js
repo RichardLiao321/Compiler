@@ -137,13 +137,12 @@
 	function resetState(){
 		state=0;
 	}//eo resetState
-    function lex(){
+    function lex(input){
         //Grab the "raw" source code.
-        var sourceCode = document.getElementById("taSourceCode").value;
+        var sourceCode = input;
         //Trim the leading and trailing spaces.
         sourceCode = trim(sourceCode);
 		//sourceCode = sourceCode.replace(/(\r\n|\n|\r)/gm,"");
-		putMessage("--------Lexing!-------",0);
 		putMessage('Lexing String: '+sourceCode,1);
 		//Check for EOF If none then give warning and add it
 		if(sourceCode.slice(-1)!='$'){
