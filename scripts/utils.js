@@ -79,3 +79,7 @@ function testPrograms(progNo){
             document.getElementById("taSourceCode").value ="{\n\tintx\n\tx = 1\n\n\t{\n\n\t\tint x\n\t\tx = 2\n\t\t{\n\t\t\tx = 5\n\t\t}\n\n\t\tprint(x)\n\t}\n\tprint(x)\n \tx=22\n}$";
         }
 }
+//replace all function
+String.prototype.replaceAll = function(str1, str2, ignore){
+    return this.replace(new RegExp(str1.replace(/([\/\,\!\\\^\$\{\}\[\]\(\)\.\*\+\?\|\<\>\-\&])/g,"\\$&"),(ignore?"gi":"g")),(typeof(str2)=="string")?str2.replace(/\$/g,"$$$$"):str2);
+} 

@@ -144,15 +144,10 @@
         sourceCode = trim(sourceCode);
 		//sourceCode = sourceCode.replace(/(\r\n|\n|\r)/gm,"");
 		putMessage('Lexing String: '+sourceCode,1);
-		//Check for EOF If none then give warning and add it
-		if(sourceCode.slice(-1)!='$'){
-			putMessage('Warning No EOF character($) found...',1);
-			sourceCode=sourceCode+'$';
-			lexWarnings++;
-		}
 		var inString=false;
 		var ct=0;//left index
 		var pos;//current index
+		var stToken="";
 		lexErrors=0;
 		lexWarnings=0;
 		process(sourceCode);
@@ -166,6 +161,7 @@
 		state=0;
 		var c=str.charAt(0);
 		var line=1;
+		stToken="";
 		pos=0;
 		//loop through input string
 		while(pos<str.length){
@@ -194,6 +190,7 @@
 			pos++;
 			//putMessage("i: "+i);
 		}//eo while
+		//if still inString, error
 		if(inString==true){
 			putMessage("Error: Unterminated String on line "+line,0);
 			lexErrors++;
@@ -320,9 +317,8 @@
 					//st=st+input.charAt(i);
 					if(isLetter(input.charAt(ct)) || input.charAt(ct)==' '){
 						putMessage('Token found: String Char('+input.charAt(pos)+') at line '+line,1);
-						tokens.push(new token('String Char',input.charAt(pos),line));
-					}else if(input.charAt(ct)!="\""){
-						
+						stToken=stToken+input.charAt(pos);
+						//tokens.push(new token('String Char',input.charAt(pos),line));
 					}
 				}else{
 					//do nothing if encountering a non-char/space in a string
@@ -335,6 +331,7 @@
 				resetState();
 				putMessage('Token found: String at line '+line,1);
 				//create " Token
+				tokens.push(new token('String',stToken,line));
 				tokens.push(new token('Quote','"',line));
 				break;
 			case 44:

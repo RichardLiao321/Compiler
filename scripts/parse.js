@@ -1,5 +1,4 @@
 function parse(){
-        putMessage("--------Parsing!-------",0);
         // Grab the next token.
         currentToken = getNextToken();
         // A valid parse derives the PROGRAM production, so begin there.
@@ -89,7 +88,7 @@ function parse(){
 		CST.endChildren();
 	}//eo parseStatementList
 	function parseStatement(){
-		//CST.addNode('statement','branch');
+		CST.addNode('statement','branch');
 		var tokenType=currentToken.type;
 		switch(tokenType){
 			case 'Keyword':
@@ -119,10 +118,10 @@ function parse(){
 			default:
 				errorCount++;
 				putMessage("Error: unable to parse statement at token index:"+tokenIndex,0);
-				//currentToken = getNextToken();
+				currentToken = getNextToken();
 				break;
 		}//eo switch case
-		//CST.endChildren();
+		CST.endChildren();
 	}//eo parseStatement
 	function parsePrintStmt(){
 		CST.addNode('print stmt','branch');
@@ -165,7 +164,7 @@ function parse(){
 		CST.endChildren();
 	}//eo parseIfStmt
 	function parseExpr(){
-		//CST.addNode('Expr','branch');
+		CST.addNode('Expr','branch');
 		switch(currentToken.type){
 			case 'Digit':
 				parseIntExpr();
@@ -192,7 +191,7 @@ function parse(){
 				putMessage("Error: unable to parse expr at token index:"+tokenIndex,0);
 				break;
 		}
-		//CST.endChildren();
+		CST.endChildren();
 	}//eo parseExpr
 	function parseIntExpr(){
 		CST.addNode('IntExpr','branch');
@@ -235,18 +234,16 @@ function parse(){
 		CST.endChildren();
 	}//eo parseId
 	function parseCharList(){
-		CST.addNode('string char','branch');
-
 		if(currentToken.type=='Quote'){
 		//empty 
 		//do nothing
 			return;
 		}else{
-			parseChar();
+			//CST.addNode('string','branch');
+			match('String',1);
 		}
-		
 		parseCharList();
-		CST.endChildren();
+		//CST.endChildren();
 	}//eo parseCharList()
 	function parseType(){
 		switch(currentToken.val){
@@ -266,20 +263,6 @@ function parse(){
 	}//eo parseType
 	//////////////EO Non-Terminals//////////////////
 	//terminals
-	function parseChar(){
-		if(isLetter(currentToken.val)||currentToken.val==' '){
-			//match char
-			//match space
-			match('String Char',1);
-		}else if(currentToken.val==' '){
-			match('String Char',1);
-		}else{
-			errorCount++;
-			putMessage("Error: Unable to parse char at "+tokenIndex,0);
-			currentToken = getNextToken();
-			return;
-		}
-	}//eo parseChar
 	function parseDigit(){
 		match('Digit',1);
 	}//eo parseDigit

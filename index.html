@@ -63,6 +63,7 @@
 			<input id='verboseOff'name="verboseMode" type="radio" >Verbose Off<br>
 		</form>
 	</div>
+	<div id="tree-simple" style="width:335px; height: 160px"> </div>
     <!-- Footer -->
 	<br>
 	<br>
@@ -88,6 +89,9 @@
     <script type="text/javascript" src="scripts/lexer.js"></script>
 	<script type="text/javascript" src="scripts/parse.js"></script>
 	<script type="text/javascript" src="scripts/cstObj.js"></script>
+	<link rel="stylesheet" href="treant-js-master/Treant.css" type="text/css"/>
+	<script src="treant-js-master/vendor/raphael.js"></script>
+    <script src="treant-js-master/Treant.js"></script>
     <script type="text/javascript">
     // Global variables
     var tokens = [];
@@ -96,17 +100,13 @@
     var errorCount = 0;
     var EOF = "$";
 	var CST = new tree();
-	
     function init() {
-        // Clear the message box.
-        document.getElementById("taOutput").value = "";
         // Set the initial values for our globals.
         tokens = [];
         tokenIndex = 0;
         currentToken = ' ';
         errorCount = 0;
 		inString=false;
-		st="";
 		ct=0;
 		CST = new tree();
     }
@@ -115,34 +115,38 @@
         // This is executed as a result of the usr pressing the 
         // "compile" button between the two text areas, above.  
         // Note the <input> element's event handler: onclick="btnCompile_click();
+        // Clear the message box.
+        document.getElementById("taOutput").value = "";
         init();
         putMessage("Compilation Started",0);
-        // Grab the tokens from the lexer . . .
+        //get text source, replace $ with $,
         var source= document.getElementById("taSourceCode").value;
-        source=source.split('$');
-        console.log(source);
-        for(p = 0; p<source.length-1;p++){
+        //Check for EOF If none then give warning and add it
+		if(source.slice(-1)!='$'){
+			putMessage('Warning No EOF character($) found...',1);
+			source=source+'$';
+			lexWarnings++;
+		}
+        var newSourceRep = source.replaceAll('$', "$~");
+        //split new string on $
+        //console.log(newSourceRep);
+		var newSource = newSourceRep.split("~");
+        //console.log(newSource);
+        //console.log(newSource.length);
+        //loop over array of programs newSource
+        //independently lex and parse each
+        for(p = 0; p<newSource.length-1;p++){
         	//Vars
-        	tokens = [];
-	        tokenIndex = 0;
-	        currentToken = ' ';
-	        errorCount = 0;
-			inString=false;
-			st="";
-			ct=0;
-			CST = new tree();
-
-        	putMessage("--------Lexing!-------",0);
-        	putMessage("--------Program "+p+"-------",0);
-	        tokens = lex(source[p]);
+        	init();
+        	putMessage("--------Lexing Program#"+p+"-------",0);
+	        tokens = lex(newSource[p]);
 	        // . . . and parse!
 			if(lexErrors==0){
-				putMessage("--------Program "+p+"-------",0);
+				putMessage("--------Parsing Program#"+p+"-------",0);
 				parse();
 				putMessage(CST.toString(),0);
 			}//eo if
-			putMessage("******************************************");
-			putMessage("******************************************");
+			putMessage("******************************************",0);
         }//eo for
     }
     
