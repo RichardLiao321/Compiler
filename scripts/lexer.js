@@ -322,6 +322,8 @@
 					}
 				}else{
 					//do nothing if encountering a non-char/space in a string
+					putMessage("Error: String"+line,0);
+					lexErrors++;
 					return;
 				}
 				break;
@@ -331,6 +333,7 @@
 				resetState();
 				putMessage('Token found: String at line '+line,1);
 				//create " Token
+				stToken=stToken+input.charAt(pos-1);
 				tokens.push(new token('String',stToken,line));
 				tokens.push(new token('Quote','"',line));
 				break;

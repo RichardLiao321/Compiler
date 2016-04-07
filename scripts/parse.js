@@ -124,7 +124,7 @@ function parse(){
 		CST.endChildren();
 	}//eo parseStatement
 	function parsePrintStmt(){
-		CST.addNode('print stmt','branch');
+		CST.addNode('print','branch');
 		//print (expr)
 		match('Print',0);
 		match('(',0);
@@ -133,7 +133,7 @@ function parse(){
 		CST.endChildren();
 	}//eo parsePrintStmt
 	function parseAssignmentStmt(){
-		CST.addNode('assignment stmt','branch');
+		CST.addNode('assign','branch');
 		//Id = expr
 		parseId();
 		match('=',0);
@@ -148,7 +148,7 @@ function parse(){
 		CST.endChildren();
 	}//eo parseVarDecl
 	function parseWhileStmt(){
-		CST.addNode('while stmt','branch');
+		CST.addNode('while','branch');
 		//while BooleanExpr Block
 		match('While',0);
 		parseBooleanExpr();
@@ -156,7 +156,7 @@ function parse(){
 		CST.endChildren();
 	}//eo parseWhileStmt
 	function parseIfStmt(){
-		CST.addNode('if stmt','branch');
+		CST.addNode('if','branch');
 		//if BooleanExpr Block
 		match('If',0);
 		parseBooleanExpr();
@@ -164,7 +164,7 @@ function parse(){
 		CST.endChildren();
 	}//eo parseIfStmt
 	function parseExpr(){
-		CST.addNode('Expr','branch');
+		CST.addNode('expr','branch');
 		switch(currentToken.type){
 			case 'Digit':
 				parseIntExpr();
@@ -233,18 +233,6 @@ function parse(){
 		//match Char
 		CST.endChildren();
 	}//eo parseId
-	function parseCharList(){
-		if(currentToken.type=='Quote'){
-		//empty 
-		//do nothing
-			return;
-		}else{
-			//CST.addNode('string','branch');
-			match('String',1);
-		}
-		parseCharList();
-		//CST.endChildren();
-	}//eo parseCharList()
 	function parseType(){
 		switch(currentToken.val){
 			case 'Int':
@@ -263,6 +251,18 @@ function parse(){
 	}//eo parseType
 	//////////////EO Non-Terminals//////////////////
 	//terminals
+	function parseCharList(){
+		if(currentToken.type=='Quote'){
+		//empty 
+		//do nothing
+			return;
+		}else{
+			//CST.addNode('string','branch');
+			match('String',1);
+		}
+		parseCharList();
+		//CST.endChildren();
+	}//eo parseCharList()
 	function parseDigit(){
 		match('Digit',1);
 	}//eo parseDigit

@@ -88,7 +88,7 @@
     <script type="text/javascript" src="scripts/utils.js"></script>	
     <script type="text/javascript" src="scripts/lexer.js"></script>
 	<script type="text/javascript" src="scripts/parse.js"></script>
-	<script type="text/javascript" src="scripts/cstObj.js"></script>
+	<script type="text/javascript" src="scripts/tree.js"></script>
 	<link rel="stylesheet" href="treant-js-master/Treant.css" type="text/css"/>
 	<script src="treant-js-master/vendor/raphael.js"></script>
     <script src="treant-js-master/Treant.js"></script>
@@ -100,6 +100,7 @@
     var errorCount = 0;
     var EOF = "$";
 	var CST = new tree();
+	var AST = new tree();
     function init() {
         // Set the initial values for our globals.
         tokens = [];
@@ -109,6 +110,7 @@
 		inString=false;
 		ct=0;
 		CST = new tree();
+		AST = new tree();
     }
     
     function btnCompile_click() {        
@@ -127,6 +129,7 @@
 			source=source+'$';
 			lexWarnings++;
 		}
+		//replace all $ with $~. ~ is not used by our language.
         var newSourceRep = source.replaceAll('$', "$~");
         //split new string on $
         //console.log(newSourceRep);
@@ -144,7 +147,13 @@
 			if(lexErrors==0){
 				putMessage("--------Parsing Program#"+p+"-------",0);
 				parse();
+				putMessage("------------CST"+p+"----------",0);
 				putMessage(CST.toString(),0);
+				
+				putMessage("************CST TO AST OUTPUT********************",0);
+				cstToAst();
+				putMessage("------------AST"+p+"----------",0);
+				putMessage(AST.toString(),0);
 			}//eo if
 			putMessage("******************************************",0);
         }//eo for
