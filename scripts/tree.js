@@ -20,7 +20,6 @@
 				this.current = newNode;
 			}//eo if
 		}//eo addNode
-		
 		this.endChildren = function(){
 			// ... by moving "up" to our parent node (if possible).
 			if ((this.current.parent !== null) && (this.current.parent.name !== undefined)){
@@ -72,82 +71,6 @@
 	        // Return the result.
 	        return traversalResult;
 	    };//eo toString
-
-
 	}//eo tree class
-	function cstToAst(){
-		var rt=CST.root;
-		//AST.addNode('root','branch');
-        // Recursive function to handle the expansion of the nodes.
-        function traverseCST(cstNode){
-        	putMessage(AST.current.name);
-
-            checkNode(cstNode);
-            // .. recursively expand them.
-            for (var i = 0; i < cstNode.children.length; i++){
-                traverseCST(cstNode.children[i]);
-            }
-            AST.endChildren();
-        }//eo traverseCST
-        // Make the initial call to expand from the root.
-        traverseCST(rt);
-	}//eo cstToAst
-	//check the branch Node to see if it fits a terminal stmt
-	function checkNode(cstNode){
-		switch(cstNode.name) {
-			case 'block':
-				putMessage('Block here: '+cstNode.parent.name,0);
-				//cstNode.parent=AST.current;
-				//AST.current.children.push(cstNode);
-				AST.addNode('block','branch');
-				//AST.current=cstNode;
-				break;
-			case 'print':
-			//do expr check
-				putMessage('Print here: '+cstNode.parent.name,0);
-				cstNode.parent=AST.current;
-				AST.current.children.push(cstNode);
-				//AST.addNode('print','branch');
-				//AST.endChildren();
-				break;
-			case 'assign':
-				putMessage('assign here: '+cstNode.parent.name,0);
-				cstNode.parent=AST.current;
-				AST.current.children.push(cstNode);
-				//AST.addNode('assign','branch');
-				//AST.endChildren();
-				break;
-			case 'vardecl':
-				putMessage('vardecl here: '+cstNode.parent.name,0);
-				cstNode.parent=AST.current;
-				AST.current.children.push(cstNode);
-				//AST.addNode('vardecl','branch');
-				//AST.endChildren();
-				break;
-			case 'while':
-			//do expr check here
-				putMessage('while here: '+cstNode.parent.name,0);
-				cstNode.parent=AST.current;
-				AST.current.children.push(cstNode);
-				//AST.addNode('while','branch');
-				//AST.endChildren();
-				break;
-			case 'if':
-			//do expr check
-				putMessage('if: '+cstNode.parent.name,0);
-				cstNode.parent=AST.current;
-				AST.current.children.push(cstNode);
-				//AST.addNode('if','branch');
-				//AST.endChildren();
-				break;
-
-		}
-
-	}
-	//traverse the cst
-	//check each cstNode visited.
-	//if the cstNode matches a pattern we know, extract the info and add it to our ast
-		//addNode()
-	//
-
+	
 

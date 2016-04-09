@@ -151,7 +151,9 @@ function parse(){
 		CST.addNode('while','branch');
 		//while BooleanExpr Block
 		match('While',0);
+		//match('(',0);
 		parseBooleanExpr();
+		//match(')',0);
 		parseBlock();
 		CST.endChildren();
 	}//eo parseWhileStmt
@@ -159,7 +161,9 @@ function parse(){
 		CST.addNode('if','branch');
 		//if BooleanExpr Block
 		match('If',0);
+		//match('(',0);
 		parseBooleanExpr();
+		//match(')',0);
 		parseBlock();
 		CST.endChildren();
 	}//eo parseIfStmt
@@ -194,7 +198,7 @@ function parse(){
 		CST.endChildren();
 	}//eo parseExpr
 	function parseIntExpr(){
-		CST.addNode('IntExpr','branch');
+		CST.addNode('intExpr','branch');
 		//digit intOp Expr
 		parseDigit();
 		if(currentToken.val=='+'){
@@ -285,3 +289,155 @@ function parse(){
 			match('+',0);
 		}
 	}//eo parseIntOp
+///////////////////////AST PART//////////////////////////////////
+///////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////
+function cstToAst(){
+		var rt=CST.root.children[0];
+        // Recursive function to handle the expansion of the nodes.
+        function traverseCST(cstNode){
+	    	//putMessage(AST.current.name);
+	        //check current Node for stmt
+	        if (cstNode.name!='block'){
+	        	//?????
+	        }else{
+		        checkBlock(cstNode);
+		        // .. recursively expand them.
+		        for (var i = 0; i < cstNode.children.length; i++){
+		            traverseCST(cstNode.children[i]);
+		        }
+		    }
+	    }//eo traverseCST
+        // Make the initial call to expand from the root.
+        traverseCST(rt);
+	}//eo cstToAst
+
+    function checkBlock(cstNode){
+    	if(cstNode.name=='block'){
+			AST.addNode('block','branch');
+			checkStmtList(cstNode.children[1]);
+			AST.endChildren();
+		}
+    }//eo checkBlock
+    function checkStmtList(cstNode){
+    	if(cstNode.children.length==2){
+    		checkNode(cstNode.children[0]);
+    		//console.log("0"+cstNode.children[0].name);
+    		checkStmtList(cstNode.children[1]);
+    		//console.log("1"+cstNode.children[1].name);
+    		AST.endChildren();
+    	}else{
+    		return;
+    	}
+    }//eo checkStmtList
+	//check the branch Node to see if it fits a terminal stmt
+	function checkNode(cstNode){
+		var cstNode= cstNode.children[0];
+		switch(cstNode.name) {
+			case 'print':
+			//do expr check
+				//putMessage('Print here: '+cstNode.parent.name,0);
+				AST.addNode('print','branch');
+				checkNodeExpr(cstNode);
+				AST.endChildren();
+				break;
+			case 'assign':
+				//create assign branch node
+				AST.addNode('assign','branch');
+				//add var name as child
+				AST.addNode(cstNode.children[0].children[0].name,'leaf')
+				//check expr for proper child
+				checkNodeExpr(cstNode);
+				//end children
+				AST.endChildren();
+				break;
+			case 'vardecl':
+				//putMessage('vardecl here: '+cstNode.parent.name,0);
+				AST.addNode('vardecl','branch');
+				AST.addNode(cstNode.children[0].name,'leaf');
+				AST.addNode(cstNode.children[1].children[0].name,'leaf');
+				AST.endChildren();
+				break;
+			case 'while':
+			//do expr check here
+				//putMessage('while here: '+cstNode.parent.name,0);
+				AST.addNode('while','branch');
+				checkNodeBoolExpr(cstNode.children[1]);
+				checkBlock(cstNode.children[2]);
+				AST.endChildren();
+				break;
+			case 'if':
+			//do expr check
+				//putMessage('if: '+cstNode.parent.name,0);
+				AST.addNode('if','branch');
+				checkNodeBoolExpr(cstNode.children[1]);
+				checkBlock(cstNode.children[2]);
+				AST.endChildren();
+				break;
+		}//eo switch
+
+	}//eo checkNode
+	//check a node's children for a matched expr pattern
+	function checkNodeExpr(cstNode){
+		//check each child for an Expr Node. Match it.
+		//console.log('cstNode: '+cstNode.name);
+	    for (var i = 0; i < cstNode.children.length; i++){
+	    	//console.log('child: '+i+' '+cstNode.children[i].name);
+			if(cstNode.children[i].name=='expr'){
+            	var exprNode = cstNode.children[i];
+            	switch(exprNode.children[0].name){
+            		//expr always has one child that is the name of the expr type
+            		case 'intExpr':
+            		//console.log(exprNode.children[0].children.length);
+            			if(exprNode.children[0].children.length>1){
+            				//if length is >1, it is digit intop expr
+            				//putMessage('booleanExpr0 ',0);
+            				AST.addNode('+','branch');
+            				AST.addNode(exprNode.children[0].children[0].name,'leaf');
+            				checkNodeExpr(exprNode.children[0]);
+            				AST.endChildren();
+            			}else{
+            				AST.addNode(exprNode.children[0].children[0].name,'leaf');
+            				//else it is single
+            			}//eo if else
+
+            			//AST.endChildren();
+            			break;
+            		case 'string':
+            			var nodeName= exprNode.children[0].children[1].name;
+            			AST.addNode(nodeName,'leaf');
+            			break;
+            		case 'booleanExpr':
+            			checkNodeBoolExpr(exprNode.children[0]);
+            			break;
+            		case 'identifier':
+            			//child is second id
+            			AST.addNode(exprNode.children[0].children[0].name,'leaf');
+            			AST.endChildren();
+            			break;
+            	}//eo switch
+            }
+        }//eo for
+	}//eo checkNodeExpr
+	function checkNodeBoolExpr(cstNode){
+		if(cstNode.name=='booleanExpr'){
+			//double check to see if it is boolExpr :/
+			if(cstNode.children.length>1){
+				//if the length is >1 it is ( expr boolop expr )
+				AST.addNode(cstNode.children[2].name,'branch');
+				//console.log("bool expr 1"+cstNode.children[1].name);
+				//console.log("bool expr 3"+cstNode.children[1].name);
+				checkNodeExpr(cstNode);
+				//checkNodeExpr(cstNode);
+				AST.endChildren();
+            }else{
+            	//single boolVal
+            	AST.addNode(cstNode.children[0].name,'leaf');
+            }
+            //
+		}else{
+			//something went wrong. How did this happen.
+			console.log("checkNodeBoolExpr called on non-boolexpr: "+cstNode.name);
+			return
+		}//eo if
+	}//eo checkNodeBoolExpr

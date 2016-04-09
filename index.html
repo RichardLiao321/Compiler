@@ -141,18 +141,17 @@
         for(p = 0; p<newSource.length-1;p++){
         	//Vars
         	init();
-        	putMessage("--------Lexing Program#"+p+"-------",0);
+        	putMessage("--------Lexing Program #"+p+"-------",0);
 	        tokens = lex(newSource[p]);
 	        // . . . and parse!
 			if(lexErrors==0){
-				putMessage("--------Parsing Program#"+p+"-------",0);
+				putMessage("--------Parsing Program #"+p+"-------",0);
 				parse();
-				putMessage("------------CST"+p+"----------",0);
+				putMessage("------------CST #"+p+"----------",0);
 				putMessage(CST.toString(),0);
-				
-				putMessage("************CST TO AST OUTPUT********************",0);
+				//putMessage("************CST TO AST OUTPUT********************",0);
 				cstToAst();
-				putMessage("------------AST"+p+"----------",0);
+				putMessage("------------AST #"+p+"----------",0);
 				putMessage(AST.toString(),0);
 			}//eo if
 			putMessage("******************************************",0);
