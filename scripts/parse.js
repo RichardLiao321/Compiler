@@ -317,10 +317,13 @@ function cstToAst(){
 			AST.addNode('block','branch');
 			checkStmtList(cstNode.children[1]);
 			AST.endChildren();
+		}else{
+
+			console.log("You're calling this in the wrong place you dope");
 		}
     }//eo checkBlock
     function checkStmtList(cstNode){
-    	if(cstNode.children.length==2){
+    	if(cstNode.children.length>1){
     		checkNode(cstNode.children[0]);
     		//console.log("0"+cstNode.children[0].name);
     		checkStmtList(cstNode.children[1]);
@@ -334,8 +337,10 @@ function cstToAst(){
 	function checkNode(cstNode){
 		var cstNode= cstNode.children[0];
 		switch(cstNode.name) {
+			case 'block':
+				checkBlock(cstNode);
+				break;
 			case 'print':
-			//do expr check
 				//putMessage('Print here: '+cstNode.parent.name,0);
 				AST.addNode('print','branch');
 				checkNodeExpr(cstNode);
@@ -356,10 +361,9 @@ function cstToAst(){
 				AST.addNode('vardecl','branch');
 				AST.addNode(cstNode.children[0].name,'leaf');
 				AST.addNode(cstNode.children[1].children[0].name,'leaf');
-				AST.endChildren();
+				//AST.endChildren();
 				break;
 			case 'while':
-			//do expr check here
 				//putMessage('while here: '+cstNode.parent.name,0);
 				AST.addNode('while','branch');
 				checkNodeBoolExpr(cstNode.children[1]);
@@ -367,7 +371,6 @@ function cstToAst(){
 				AST.endChildren();
 				break;
 			case 'if':
-			//do expr check
 				//putMessage('if: '+cstNode.parent.name,0);
 				AST.addNode('if','branch');
 				checkNodeBoolExpr(cstNode.children[1]);
@@ -400,8 +403,6 @@ function cstToAst(){
             				AST.addNode(exprNode.children[0].children[0].name,'leaf');
             				//else it is single
             			}//eo if else
-
-            			//AST.endChildren();
             			break;
             		case 'string':
             			var nodeName= exprNode.children[0].children[1].name;
@@ -413,7 +414,7 @@ function cstToAst(){
             		case 'identifier':
             			//child is second id
             			AST.addNode(exprNode.children[0].children[0].name,'leaf');
-            			AST.endChildren();
+            			//AST.endChildren();
             			break;
             	}//eo switch
             }
