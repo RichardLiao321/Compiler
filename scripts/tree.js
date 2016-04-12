@@ -20,6 +20,25 @@
 				this.current = newNode;
 			}//eo if
 		}//eo addNode
+		this.addSymbolNode = function(name,kind){
+			var newNode = {
+							name:name,
+							symbolMap:{},
+							children:[],
+							parent:{}
+			};
+			if((this.root == null) || (!this.root)){//see if we are at root
+				this.root=newNode;
+			}else{//we are at a child
+				// Make our parent the CURrent node...
+				newNode.parent = this.current;
+				this.current.children.push(newNode);
+			}//eo if else
+			if (kind == "branch"){
+				// ... update the CURrent node pointer to ourselves.
+				this.current = newNode;
+			}//eo if
+		};//eo addSymbolNode
 		this.endChildren = function(){
 			// ... by moving "up" to our parent node (if possible).
 			if ((this.current.parent !== null) && (this.current.parent.name !== undefined)){

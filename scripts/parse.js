@@ -318,20 +318,14 @@ function cstToAst(){
 			checkStmtList(cstNode.children[1]);
 			AST.endChildren();
 		}else{
-
 			console.log("You're calling this in the wrong place you dope");
-		}
+		}//eo if else
     }//eo checkBlock
     function checkStmtList(cstNode){
     	if(cstNode.children.length>1){
     		checkNode(cstNode.children[0]);
-    		//console.log("0"+cstNode.children[0].name);
     		checkStmtList(cstNode.children[1]);
-    		//console.log("1"+cstNode.children[1].name);
-    		AST.endChildren();
-    	}else{
-    		return;
-    	}
+    	}//eo if
     }//eo checkStmtList
 	//check the branch Node to see if it fits a terminal stmt
 	function checkNode(cstNode){
@@ -361,7 +355,7 @@ function cstToAst(){
 				AST.addNode('vardecl','branch');
 				AST.addNode(cstNode.children[0].name,'leaf');
 				AST.addNode(cstNode.children[1].children[0].name,'leaf');
-				//AST.endChildren();
+				AST.endChildren();
 				break;
 			case 'while':
 				//putMessage('while here: '+cstNode.parent.name,0);
@@ -417,7 +411,7 @@ function cstToAst(){
             			//AST.endChildren();
             			break;
             	}//eo switch
-            }
+            }//eo if
         }//eo for
 	}//eo checkNodeExpr
 	function checkNodeBoolExpr(cstNode){
@@ -434,11 +428,10 @@ function cstToAst(){
             }else{
             	//single boolVal
             	AST.addNode(cstNode.children[0].name,'leaf');
-            }
-            //
+            }//eo if else
 		}else{
 			//something went wrong. How did this happen.
 			console.log("checkNodeBoolExpr called on non-boolexpr: "+cstNode.name);
 			return
-		}//eo if
+		}//eo if else
 	}//eo checkNodeBoolExpr
