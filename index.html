@@ -102,6 +102,7 @@
     var EOF = "$";
 	var CST = new tree();
 	var AST = new tree();
+
     function init() {
         // Set the initial values for our globals.
         tokens = [];
@@ -112,6 +113,8 @@
 		ct=0;
 		CST = new tree();
 		AST = new tree();
+		symbolTable = new tree();
+		scope =-1;
     }
     
     function btnCompile_click() {        
@@ -161,7 +164,8 @@
 				putMessage("------------AST #"+p+"----------",0);
 				putMessage(AST.toString(),0);
 				putMessage("------------Semantic Analysis #"+p+"----------",0);
-				cstToAst();
+				buildSymbolTable(AST.root);
+				putMessage(symbolTable.toString(),0);
 			}//eo if
 			putMessage("******************************************",0);
         }//eo for

@@ -2,9 +2,10 @@
 	function tree(){
 		this.root=null;
 		this.current={};//current node pointer to node
-		this.addNode = function(name,kind){
+		this.addNode = function(name,kind,line){
 			var newNode = {
 							name:name,
+							line:line,
 							children:[],
 							parent:{}
 			};
@@ -20,9 +21,10 @@
 				this.current = newNode;
 			}//eo if
 		}//eo addNode
-		this.addSymbolNode = function(name,kind){
+		this.addSymbolNode = function(name,kind,line){
 			var newNode = {
 							name:name,
+							line:line,
 							symbolMap:{},
 							children:[],
 							parent:{}

@@ -29,7 +29,7 @@ function parse(){
 				case 0:
 					putMessage("Expecting: " +st,1);
 					if(currentToken.val==st){
-						CST.addNode(st,'leaf');
+						CST.addNode(st,'leaf',currentToken.line);
 						putMessage('Got: '+currentToken.val,1);
 					}else{
 						errorCount++;
@@ -40,7 +40,7 @@ function parse(){
 				case 1:
 					putMessage("Expecting Type: " +st,1);
 					if(currentToken.type==st){
-						CST.addNode(currentToken.val,'leaf');
+						CST.addNode(currentToken.val,'leaf',currentToken.line);
 						putMessage('Got Type: '+currentToken.type,1);
 					}else{
 						errorCount++;
@@ -58,7 +58,7 @@ function parse(){
 	//////////////Non-Terminals/////////////////
     function parseProgram(){
 		//program can be a block followed by EOP($)
-		CST.addNode('root','branch');
+		CST.addNode('root','branch',currentToken.line);
 		parseBlock();
 		match('$',0);
 		if(tokenIndex<tokens.length){
@@ -67,7 +67,7 @@ function parse(){
 	}//eo parseProgram
 	function parseBlock(){
 		//{StatementList}
-		CST.addNode('block','branch');
+		CST.addNode('block','branch',currentToken.line);
 		match('{',0);
 		parseStatementList();
 		match('}',0);
@@ -76,7 +76,7 @@ function parse(){
 	function parseStatementList(){
 		//statement statementlist
 		//empty string
-		CST.addNode('statement list','branch');
+		CST.addNode('statement list','branch',currentToken.line);
 		if(currentToken.type=='Keyword'||currentToken.type=='Identifier'||currentToken.type=='Type'||currentToken.type=='LeftBracket'){
 			parseStatement();
 			parseStatementList();
@@ -88,7 +88,7 @@ function parse(){
 		CST.endChildren();
 	}//eo parseStatementList
 	function parseStatement(){
-		CST.addNode('statement','branch');
+		CST.addNode('statement','branch',currentToken.line);
 		var tokenType=currentToken.type;
 		switch(tokenType){
 			case 'Keyword':
@@ -124,7 +124,7 @@ function parse(){
 		CST.endChildren();
 	}//eo parseStatement
 	function parsePrintStmt(){
-		CST.addNode('print','branch');
+		CST.addNode('print','branch',currentToken.line);
 		//print (expr)
 		match('Print',0);
 		match('(',0);
@@ -133,7 +133,7 @@ function parse(){
 		CST.endChildren();
 	}//eo parsePrintStmt
 	function parseAssignmentStmt(){
-		CST.addNode('assign','branch');
+		CST.addNode('assign','branch',currentToken.line);
 		//Id = expr
 		parseId();
 		match('=',0);
@@ -141,14 +141,14 @@ function parse(){
 		CST.endChildren();
 	}//eo parseAssignmentStmt
 	function parseVarDecl(){
-		CST.addNode('vardecl','branch');
+		CST.addNode('vardecl','branch',currentToken.line);
 		//type Id
 		parseType();
 		parseId();
 		CST.endChildren();
 	}//eo parseVarDecl
 	function parseWhileStmt(){
-		CST.addNode('while','branch');
+		CST.addNode('while','branch',currentToken.line);
 		//while BooleanExpr Block
 		match('While',0);
 		//match('(',0);
@@ -158,7 +158,7 @@ function parse(){
 		CST.endChildren();
 	}//eo parseWhileStmt
 	function parseIfStmt(){
-		CST.addNode('if','branch');
+		CST.addNode('if','branch',currentToken.line);
 		//if BooleanExpr Block
 		match('If',0);
 		//match('(',0);
@@ -168,7 +168,7 @@ function parse(){
 		CST.endChildren();
 	}//eo parseIfStmt
 	function parseExpr(){
-		CST.addNode('expr','branch');
+		CST.addNode('expr','branch',currentToken.line);
 		switch(currentToken.type){
 			case 'Digit':
 				parseIntExpr();
@@ -198,7 +198,7 @@ function parse(){
 		CST.endChildren();
 	}//eo parseExpr
 	function parseIntExpr(){
-		CST.addNode('intExpr','branch');
+		CST.addNode('intExpr','branch',currentToken.line);
 		//digit intOp Expr
 		parseDigit();
 		if(currentToken.val=='+'){
@@ -209,14 +209,14 @@ function parse(){
 		//digit
 	}//eo parseIntExpr
 	function parseStringExpr(){
-		CST.addNode('string','branch');
+		CST.addNode('string','branch',currentToken.line);
 		match('\"',0);
 		parseCharList();
 		match('\"',0);
 		CST.endChildren();
 	}//eo parseStringExpr
 	function parseBooleanExpr(){
-		CST.addNode('booleanExpr','branch');
+		CST.addNode('booleanExpr','branch',currentToken.line);
 		//(Expr boolOp Expr)
 		if(currentToken.val=='('){
 			match('(',0);
@@ -231,7 +231,7 @@ function parse(){
 		CST.endChildren();
 	}//eo parseBoolExpr
 	function parseId(){
-		CST.addNode('identifier','branch');
+		CST.addNode('identifier','branch',currentToken.line);
 		match('Identifier',1);
 		//char
 		//match Char
@@ -314,7 +314,7 @@ function cstToAst(){
 
     function checkBlock(cstNode){
     	if(cstNode.name=='block'){
-			AST.addNode('block','branch');
+			AST.addNode('block','branch',cstNode.line);
 			checkStmtList(cstNode.children[1]);
 			AST.endChildren();
 		}else{
@@ -336,15 +336,15 @@ function cstToAst(){
 				break;
 			case 'print':
 				//putMessage('Print here: '+cstNode.parent.name,0);
-				AST.addNode('print','branch');
+				AST.addNode('print','branch',cstNode.line);
 				checkNodeExpr(cstNode);
 				AST.endChildren();
 				break;
 			case 'assign':
 				//create assign branch node
-				AST.addNode('assign','branch');
+				AST.addNode('assign','branch',cstNode.line);
 				//add var name as child
-				AST.addNode(cstNode.children[0].children[0].name,'leaf')
+				AST.addNode(cstNode.children[0].children[0].name,'leaf',cstNode.line)
 				//check expr for proper child
 				checkNodeExpr(cstNode);
 				//end children
@@ -352,21 +352,21 @@ function cstToAst(){
 				break;
 			case 'vardecl':
 				//putMessage('vardecl here: '+cstNode.parent.name,0);
-				AST.addNode('vardecl','branch');
-				AST.addNode(cstNode.children[0].name,'leaf');
-				AST.addNode(cstNode.children[1].children[0].name,'leaf');
+				AST.addNode('vardecl','branch',cstNode.line);
+				AST.addNode(cstNode.children[0].name,'leaf',cstNode.line);
+				AST.addNode(cstNode.children[1].children[0].name,'leaf',cstNode.line);
 				AST.endChildren();
 				break;
 			case 'while':
 				//putMessage('while here: '+cstNode.parent.name,0);
-				AST.addNode('while','branch');
+				AST.addNode('while','branch',cstNode.line);
 				checkNodeBoolExpr(cstNode.children[1]);
 				checkBlock(cstNode.children[2]);
 				AST.endChildren();
 				break;
 			case 'if':
 				//putMessage('if: '+cstNode.parent.name,0);
-				AST.addNode('if','branch');
+				AST.addNode('if','branch',cstNode.line);
 				checkNodeBoolExpr(cstNode.children[1]);
 				checkBlock(cstNode.children[2]);
 				AST.endChildren();
@@ -389,25 +389,25 @@ function cstToAst(){
             			if(exprNode.children[0].children.length>1){
             				//if length is >1, it is digit intop expr
             				//putMessage('booleanExpr0 ',0);
-            				AST.addNode('+','branch');
-            				AST.addNode(exprNode.children[0].children[0].name,'leaf');
+            				AST.addNode('+','branch',cstNode.line);
+            				AST.addNode(exprNode.children[0].children[0].name,'leaf',cstNode.line);
             				checkNodeExpr(exprNode.children[0]);
             				AST.endChildren();
             			}else{
-            				AST.addNode(exprNode.children[0].children[0].name,'leaf');
+            				AST.addNode(exprNode.children[0].children[0].name,'leaf',cstNode.line);
             				//else it is single
             			}//eo if else
             			break;
             		case 'string':
             			var nodeName= exprNode.children[0].children[1].name;
-            			AST.addNode(nodeName,'leaf');
+            			AST.addNode(nodeName,'leaf',cstNode.line);
             			break;
             		case 'booleanExpr':
             			checkNodeBoolExpr(exprNode.children[0]);
             			break;
             		case 'identifier':
             			//child is second id
-            			AST.addNode(exprNode.children[0].children[0].name,'leaf');
+            			AST.addNode(exprNode.children[0].children[0].name,'leaf',cstNode.line);
             			//AST.endChildren();
             			break;
             	}//eo switch
@@ -419,7 +419,7 @@ function cstToAst(){
 			//double check to see if it is boolExpr :/
 			if(cstNode.children.length>1){
 				//if the length is >1 it is ( expr boolop expr )
-				AST.addNode(cstNode.children[2].name,'branch');
+				AST.addNode(cstNode.children[2].name,'branch',cstNode.line);
 				//console.log("bool expr 1"+cstNode.children[1].name);
 				//console.log("bool expr 3"+cstNode.children[1].name);
 				checkNodeExpr(cstNode);
@@ -427,7 +427,7 @@ function cstToAst(){
 				AST.endChildren();
             }else{
             	//single boolVal
-            	AST.addNode(cstNode.children[0].name,'leaf');
+            	AST.addNode(cstNode.children[0].name,'leaf',cstNode.line);
             }//eo if else
 		}else{
 			//something went wrong. How did this happen.
