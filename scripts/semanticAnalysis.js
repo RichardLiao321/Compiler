@@ -1,24 +1,23 @@
-var semErrors
-var semWarnings;
+var semErrors=0;
+var semWarnings=0;
 var scope =-1;
 function buildSymbolTable(astRoot){
-		var rt=astRoot;
-        // Recursive function to handle the expansion of the nodes.
-        function traverseAST(astNode){
-		        // .. recursively expand them.
-		        console.log(astNode.name);
-		        analyzeASTNode(astNode);
-	        if(astNode.name!='block'){
+	var rt=astRoot;
+	semErrors=0;
+    semWarnings=0;
+    // Recursive function to handle the expansion of the nodes.
+    function traverseAST(astNode){
+	        // .. recursively expand them.
+        if(astNode.name!='block'){
+        	//????? cry????
+        }else if(astNode.name=='block'){
+        	analyzeBlock(astNode);
 
-	        }else if(astNode.name=='block'){
-	        	
-		        for (var i = 0; i < astNode.children.length; i++){
-		            traverseAST(astNode.children[i]);
-		        }//eo for
-	    	}//eo if else
-	    }//eo traverseCST
-        // Make the initial call to expand from the root.
-        traverseAST(rt);
+    	}//eo if else
+    }//eo traverseCST
+    // Make the initial call to expand from the root.
+    traverseAST(rt);
+    putMessage("Semantic Analysis completed with "+semErrors+" error(s) and "+semWarnings+" warnings" ,0);
 }//eo buildSymbolTable
 function analyzeBlock(astNode){
 	if(astNode.name=='block'){
@@ -37,7 +36,7 @@ function analyzeBlockChildren(astNode){
 			analyzeASTNode(astNode.children[i1]);
 		}//eo for
 	}//eo if
-}//eo checkStmtList
+}//eo analyzeBlockChildren
 function analyzeASTNode(astNode){
 	putMessage("current scope = "+symbolTable.current.name+" for "+astNode.name,1);
 	switch(astNode.name){
@@ -64,11 +63,32 @@ function analyzeASTNode(astNode){
 			putMessage("Analyzing: "+astNode.name+" on line "+astNode.line,1)
 			analyzeIfWhile(astNode);
 			break;
-
 	}//eo switch
-
 }//eo analyzeASTNode
-
+function lookUpNode(astNode,scope){
+	var currScope = scope;
+	var symbolTableResult = scope.symbolMap[astNode.name];
+	//check current scope for symbol
+	if(symbolTableResult!=undefined){
+		//if it exists in current scope return
+		putMessage("Found "+astNode.name+" in scope "+currScope.name+" with type "+symbolTableResult,1);
+		return symbolTableResult;
+	}else{
+		//else check parents until root
+		while(currScope!=symbolTable.root){
+			//loop until at root
+			currScope=currScope.parent;
+			putMessage("checking scope: "+currScope.name+" for "+astNode.name,1);
+			var symbolTableResult = currScope.symbolMap[astNode.name];
+			if(symbolTableResult!=undefined){
+				//if not undefined then symbol found
+				putMessage("Found "+astNode.name+" in scope "+currScope.name+" with type "+symbolTableResult,1);
+				return symbolTableResult;
+			}//eo if
+			
+		}//eo while
+	}
+}//eo analyzeASTNode
 function analyzeVardecl(astNode){
 	var idNode = astNode.children[1];
 	var valNode = astNode.children[0];
@@ -79,62 +99,106 @@ function analyzeVardecl(astNode){
 		semErrors++;
 	}else{
 		//add it to symbol table at current scope
-		putMessage("Adding "+idNode.name +" to symbol table with value of "+ valNode.name+" one line "+astNode.line,1);
+		putMessage("Adding "+idNode.name +" to symbol table with value of "+ valNode.name+" on line "+astNode.line,1);
 		symbolTable.current.symbolMap[idNode.name]=valNode.name
 
 	}//eo if
 }//eo analyzeVardecl
+
 function analyzeAssign(astNode){
 	var idNode = astNode.children[0];
 	var valNode = astNode.children[1];
 	putMessage("Got Assign. Checking id "+idNode.name+" against value "+valNode.name +" on line "+ astNode.line,1);
-	analyzeNodeType(astNode,idNode.name,valNode);
+	analyzeNodeType(astNode,idNode,valNode);
 }//eo analyzeAssign
+
 function analyzeIfWhile(astNode){
-
+    if (astNode.children[0].name =='!='||astNode.children[0].name =='=='){
+        var left = astNode.children[0].children[0];
+        var compChild = astNode.children[0];
+        var right = astNode.children[0].children[1];
+        putMessage("Got Comparison on line "+left.name,1);
+        if (isLetter(left.name)){
+        	//if is identifier
+            var temp = this.findVarType(left, symbolTable, true);
+            type = temp[0];
+            symbolTable = temp[1];
+        }
+        symbolTable = this.checkType(type, currNode, symbolTable);
+        this.numComps = 0;
+    }else if (currNode.getChildren()[0].type === "BOOL") {
+        //why is while/if boolVal a thing?????
+        symbolTable = this.checkType("BOOL", currNode.getChildren()[0], symbolTable);
+        this.numComps = 0;
+    }
 }//eo analyzeVardecl
-function analyzePrint(astNode){
 
+function analyzePrint(astNode){
+	if(isLetter(astNode.children[0].name)){
+		//if the child is an id.
+		if(lookUpNode(astNode.children[0],symbolTable.current)==undefined){
+			putMessage("Error: Identifier("+astNode.children[0].name+") not found in symbol table ",0);//
+			semErrors++;
+		}else{
+			//do nothing :)
+		}//eo if else
+	}//eo if
 }//eo analyzePrint
+
 function analyzeNodeType(astNode,id,value){
-	var nodeType = symbolTable.current.symbolMap[id];
+	var nodeType = lookUpNode(id,symbolTable.current);
 	if(nodeType===undefined){
 		//id has no entry
 		//possibly check parent scope
-		putMessage("Error: Identifier("+id+") not found in scope "+symbolTable.current.name,0);
+		putMessage("Error: Identifier("+id.name+") not found in symbol table ",0);//+symbolTable.current.name
 		semErrors++;
 	}else if(nodeType!=undefined){
 		switch(nodeType){
 			case 'Int':
-				if(isInt(value.name)){
-					putMessage("Id "+id+" is type "+nodeType,1);
-
+				if(value.name=='+'){
+					//if value is a + that means we have operators
+					putMessage("Analyze int expr node on line "+astNode.line,1);
+					analyzeIntExpr(value);
 				}else{
-					putMessage("Error: Type mismatch on line "+ astNode.line+". Id "+id+" is type "+nodeType+" got "+value.name,0);
-					semErrors++;
-				}
+					//otherwise it is a single value and we can just look it up
+					if(isInt(value.name)){
+						putMessage("Id "+id.name+" is type "+nodeType,1);
+					}else{
+						putMessage("Error: Type mismatch on line "+ astNode.line+". Id "+id.name+" is type "+nodeType+" got "+value.name,0);
+						semErrors++;
+					}//eo if else
+				}//oe if else
 				break;
 			case 'Boolean':
 				if(value.name=='True'||value.name=='False'){
-					putMessage("Id "+id+" is type "+nodeType,1);
+					putMessage("Id "+id.name+" is type "+nodeType,1);
 				}else{
-					putMessage("Error: Type mismatch on line "+ astNode.line+". Id "+id+" is type "+nodeType+" got "+value.name,0);
+					putMessage("Error: Type mismatch on line "+ astNode.line+". Id "+id.name+" is type "+nodeType+" got "+value.name,0);
 					semErrors++;
 				}
 				break;
 			case 'String':
-				if(isLetter(value.name)){
-					putMessage("Id "+id+" is type "+nodeType,1);
-
+				if(value.name[0]=='\"'){
+					putMessage("Id "+id.name+" is type "+nodeType,1);
 				}else{
-					putMessage("Error: Type mismatch on line "+ astNode.line+". Id "+id+" is type "+nodeType+" got "+value.name,0);
+					putMessage("Error: Type mismatch on line "+ astNode.line+". Id "+id.name+" is type "+nodeType+" got "+value.name,0);
 					semErrors++;
 				}
 				break;
-
 		}//eo switch
-
 	}//eo else if
-
 }//eo analyzeNodeType
+function analyzeIntExpr(astNode){
+	var left = astNode.children[0];
+	var right = astNode.children[1];
+	putMessage("Comparing: "+ left.name+" vs "+right.name,1);
+	if(right.name=='+'){
+		analyzeIntExpr(right);
+	}else if(isInt(left.name)&&isInt(right.name)){
+		putMessage("Int Expression is valid",1);
+	}else{
+		putMessage("Error: Type mismatch on line "+astNode.line+" ",0);
+		semErrors++;
+	}//eo if else
+}//eo analyzeIntExpr
 

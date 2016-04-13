@@ -400,7 +400,12 @@ function cstToAst(){
             			break;
             		case 'string':
             			var nodeName= exprNode.children[0].children[1].name;
-            			AST.addNode(nodeName,'leaf',cstNode.line);
+            			//console.log("string here "+nodeName);
+            			if(nodeName==='\"'){
+            				nodeName='emptystr';
+            			}
+            			//cheeky fix. re add quotes because it makes type checking easier :)
+            			AST.addNode("\""+nodeName+"\"",'leaf',cstNode.line);
             			break;
             		case 'booleanExpr':
             			checkNodeBoolExpr(exprNode.children[0]);
