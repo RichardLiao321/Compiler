@@ -41,6 +41,15 @@
 				this.current = newNode;
 			}//eo if
 		};//eo addSymbolNode
+		this.addSymbolEntry = function(id,value,type){
+			var newEntry = {
+							//id:id,
+							value:value,
+							type:type,
+							used:false
+			};
+			this.current.symbolMap[id]= newEntry;
+		};//eo addSymbolEntry
 		this.endChildren = function(){
 			// ... by moving "up" to our parent node (if possible).
 			if ((this.current.parent !== null) && (this.current.parent.name !== undefined)){
