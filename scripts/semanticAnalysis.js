@@ -106,60 +106,6 @@ function analyzeVardecl(astNode){
 	}//eo if
 }//eo analyzeVardecl
 
-function analyzeAssign(astNode){
-	var idNode = astNode.children[0];
-	var valNode = astNode.children[1];
-	var leftType = analyzeTypeExpr(idNode);
-	var rightType = analyzeTypeExpr(valNode)
-	if(leftType==rightType){
-		putMessage("Valid assignment",1);
-		var idNodeType= lookUpNode(idNode,symbolTable.current);
-		//*****************LATER CHANGE THIS TO A REAL VALUE************************
-		idNodeType.value = valNode.name;
-	}else{
-		putMessage("Error: Type mismatch.("+ idNode.name+")"+leftType+" vs ("+ valNode.name+")" + rightType+" on line "+astNode.line ,0);
-		semErrors++;
-	}
-}//eo analyzeAssign
-/*
-	//prepare for nested if else hell!
-	var idNode = astNode.children[0];
-	var valNode = astNode.children[1];
-	var idNodeType= lookUpNode(idNode,symbolTable.current);
-	//check to see if idNode is in symbol table
-	if(idNodeType!=undefined){
-		//check right side, if not ID simple compare
-		if(!isLetter(valNode.name)){
-			putMessage("Got Assign. Checking id "+idNode.name+" against value "+valNode.name +" on line "+ astNode.line,1);
-			analyzeIdType(astNode,idNode,valNode);
-		}else{
-			//valNode is an ID
-			//look it up and make sure it exists
-			if(lookUpNode(valNode,symbolTable.current)!=undefined){
-				var valNodeType = lookUpNode(valNode,symbolTable.current);
-				//iff exists compare 
-				if(valNodeType.type == idNodeType.type){
-					//two types match
-					//give idNodeType a value
-					putMessage("Valid assignment",1);
-					//*****************LATER CHANGE THIS TO A REAL VALUE************************
-					idNodeType.value = valNode.name;
-				}else{
-					//two types do not match
-					putMessage("Error: Type mismatch. identifier("+idNode.name+") type "+idNodeType.type+" expected "+ idNodeType.type+" got identifier("+valNode.name+") type "+valNodeType.type,0);
-					semErrors++;
-				}//eo if else 3
-			}else{
-				//valNode not in symbol table error
-				putMessage("Error: Identifier("+valNode.name+") not found in symbol table ",0);//
-				semErrors++;
-			}//eo if else 2
-		}//eo if else 1
-	}else{
-		
-	}//eo if else 0
-
-*/
 function analyzeIfWhile(astNode){
     if (astNode.children[0].name =='!='||astNode.children[0].name =='=='){
         var compChild = astNode.children[0];
@@ -175,20 +121,36 @@ function analyzeIfWhile(astNode){
 		semErrors++;			
     }
 }//eo analyzeIfWhile
+
+function analyzeAssign(astNode){
+	var idNode = astNode.children[0];
+	var valNode = astNode.children[1];
+	var leftType = analyzeTypeExpr(idNode);
+	var rightType = analyzeTypeExpr(valNode)
+	if(leftType==rightType){
+		putMessage("Valid assignment",1);
+		var idNodeType= lookUpNode(idNode,symbolTable.current);
+		//*****************LATER CHANGE THIS TO A REAL VALUE************************
+		idNodeType.value = valNode.name;
+	}else if(leftType!=rightType&&leftType!=undefined&&rightType!=undefined){
+		putMessage("Error: Type mismatch.("+ idNode.name+")"+leftType+" vs ("+ valNode.name+")" + rightType+" on line "+astNode.line ,0);
+		semErrors++;
+	}
+}//eo analyzeAssign
+
 function analyzeBoolExpr(astNode){
 	var left = astNode.children[0];
 	var right = astNode.children[1];
-	var leftEntry;
-	var rightEntry;
+	var leftEntry=analyzeTypeExpr(left);
+	var rightEntry=analyzeTypeExpr(right);
 	var isValid= false;
-	if(right.name=='!='||right.name=='=='){
-		analyzeBoolExpr(right);
-	}
-	putMessage("Comparing: "+ analyzeTypeExpr(left)+" vs "+analyzeTypeExpr(right),1);
-	if(analyzeTypeExpr(left)==analyzeTypeExpr(right)){
+
+	putMessage("Comparing: "+ leftEntry+" vs "+rightEntry,1);
+	if(leftEntry==rightEntry){
+		//return 'Boolean'
 		isValid = true;
-	}else{
-		putMessage("Error: Type mismatch on line "+ astNode.line+" Got "+analyzeTypeExpr(left)+" vs "+analyzeTypeExpr(right),0);
+	}else if(leftEntry!=rightEntry&&leftEntry!=undefined&&rightEntry!=undefined){
+		putMessage("Error: Type mismatch on line "+ astNode.line+" Got "+leftEntry+" vs "+rightEntry,0);
 		semErrors++;
 		isValid=false	
 	}
@@ -198,37 +160,32 @@ function analyzeBoolExpr(astNode){
 function analyzeTypeExpr(astNode){
 	var type;
 	var name= astNode.name;
+	//console.log(astNode.name);
 	if(isLetter(name)){
 		var x = lookUpNode(astNode,symbolTable.current);
 		if(x==undefined){
 			//error
 			putMessage("Error: Identifier("+astNode.name+") not found in symbol table ",0);//
 			semErrors++;
+			return 'error';
 		}else{
 			type = x.type;
 		}
 	}else if(isInt(name)){
 		type = 'Int';
-	}else if(name=='true'|| name=='false'){
+	}else if(name=='True'|| name=='False'){
 		type = 'Boolean';
 	}else if(name.indexOf('\"')!=-1){
 		type = 'String';
 	}else if(name=='+'){
-		var validIntExpr =analyzeIntExpr(astNode.children[1]);
 		//console.log(yo);
-		if(validIntExpr){
+		if(analyzeIntExpr(astNode)){
 			type = 'Int'
-		}else{
-			putMessage('HRERER',0)
-
 		}
 	}else if(name=='=='||name=='!='){
- /*       var compChild = astNode;
-        putMessage("Got Comparison on line "+astNode.line,1);
-        //console.log(analyzeBoolExpr(compChild));
-        if(analyzeBoolExpr(compChild)){
-        	type='Boolean';
-        }*/
+		if(analyzeBoolExpr(astNode)){
+			type='Boolean';
+		}
         //analyzeBlock(astNode.children[1]);
 	}else{
 		putMessage("SOMETHING WENT WRONG ON LINE "+astNode.line,0);
@@ -252,7 +209,7 @@ function analyzePrint(astNode){
 function analyzeIntExpr(astNode){
 	var left = astNode.children[0];
 	var right = astNode.children[1];
-	var rightEntry = lookUpNode(right,symbolTable.current);
+	//var rightEntry = lookUpNode(right,symbolTable.current);
 	var isValid = false;
 	putMessage("Comparing: "+ left.name+" vs "+right.name,1);
 	if(right.name=='+'){
@@ -262,67 +219,13 @@ function analyzeIntExpr(astNode){
 		//*****************LATER CHANGE THIS TO A REAL VALUE************************
 		//symbolEntry.value = right.name;
 		isValid = true;
-	}else if(rightEntry!=undefined &&rightEntry.type=='Int'){
+	}else if(analyzeTypeExpr(left)!=analyzeTypeExpr(right)){
 		//do nothing.
-		isValid = true;
-	}else{
-		//putMessage("Error: Type mismatch on line "+astNode.line+" ",0);
-		//semErrors++;
-	}//eo if else
+		putMessage("Error: Identifier("+right.name+") not found in symbol table ",0);//
+		semErrors++;
+		
+	}
 	return isValid;
 }//eo analyzeIntExpr
-/*
-function analyzeIdType(astNode,id,value){
-	var nodeType = lookUpNode(id,symbolTable.current);
-	var idNode = id;
-	var valNode = value;
-	if(nodeType.type===undefined){
-		//id has no entry
-		//possibly check parent scope
-		putMessage("Error: Identifier("+id.name+") not found in symbol table ",0);//+symbolTable.current.name
-		semErrors++;
-	}else if(nodeType.type!=undefined){
-		switch(nodeType.type){
-			case 'Int':
-				if(value.name=='+'){
-					//if value is a + that means we have operators
-					putMessage("Analyze int expr node on line "+astNode.line,1);
-					if(analyzeIntExpr(value)){
-						nodeType.value=value.name;
-					}
-				}else{
-					//otherwise it is a single value and we can just look it up
-					if(isInt(value.name)){
-						putMessage("Id "+id.name+" is type "+nodeType.type,1);
-						//set symbolmap value
-						nodeType.value=value.name;
-					}else{
-						putMessage("Error: Type mismatch on line "+ astNode.line+". Id "+id.name+" is type "+nodeType.type+" got "+value.name,0);
-						semErrors++;
-					}//eo if else
-				}//oe if else
-				break;
-			case 'Boolean':
-				if(value.name=='True'||value.name=='False'){
-					putMessage("Id "+id.name+" is type "+nodeType.type,1);
-					nodeType.value=value.name;
-				}else{
-					putMessage("Error: Type mismatch on line "+ astNode.line+". Id "+id.name+" is type "+nodeType.type+" got "+value.name,0);
-					semErrors++;
-				}
-				break;
-			case 'String':
-				if(value.name[0]=='\"'){
-					putMessage("Id "+id.name+" is type "+nodeType.type,1);
-					nodeType.value=value.name;
-				}else{
-					putMessage("Error: Type mismatch on line "+ astNode.line+". Id "+id.name+" is type "+nodeType.type+" got "+value.name,0);
-					semErrors++;
-				}
-				break;
-		}//eo switch
-	}//eo else if
-}//eo analyzeIdType
-*/
 
 
