@@ -107,6 +107,21 @@ function analyzeVardecl(astNode){
 }//eo analyzeVardecl
 
 function analyzeAssign(astNode){
+	var idNode = astNode.children[0];
+	var valNode = astNode.children[1];
+	var leftType = analyzeTypeExpr(idNode);
+	var rightType = analyzeTypeExpr(valNode)
+	if(leftType==rightType){
+		putMessage("Valid assignment",1);
+		var idNodeType= lookUpNode(idNode,symbolTable.current);
+		//*****************LATER CHANGE THIS TO A REAL VALUE************************
+		idNodeType.value = valNode.name;
+	}else{
+		putMessage("Error: Type mismatch.("+ idNode.name+")"+leftType+" vs ("+ valNode.name+")" + rightType+" on line "+astNode.line ,0);
+		semErrors++;
+	}
+}//eo analyzeAssign
+/*
 	//prepare for nested if else hell!
 	var idNode = astNode.children[0];
 	var valNode = astNode.children[1];
@@ -116,7 +131,7 @@ function analyzeAssign(astNode){
 		//check right side, if not ID simple compare
 		if(!isLetter(valNode.name)){
 			putMessage("Got Assign. Checking id "+idNode.name+" against value "+valNode.name +" on line "+ astNode.line,1);
-			analyzeNodeType(astNode,idNode,valNode);
+			analyzeIdType(astNode,idNode,valNode);
 		}else{
 			//valNode is an ID
 			//look it up and make sure it exists
@@ -141,30 +156,85 @@ function analyzeAssign(astNode){
 			}//eo if else 2
 		}//eo if else 1
 	}else{
-		//this should be caught in parse
+		
 	}//eo if else 0
-}//eo analyzeAssign
 
+*/
 function analyzeIfWhile(astNode){
     if (astNode.children[0].name =='!='||astNode.children[0].name =='=='){
-        var left = astNode.children[0].children[0];
         var compChild = astNode.children[0];
-        var right = astNode.children[0].children[1];
-        putMessage("Got Comparison on line "+left.line,1);
-        if (isLetter(left.name)){
-        	//if left is identifier
-            var temp = this.findVarType(left, symbolTable, true);
-            type = temp[0];
-            symbolTable = temp[1];
-        }
-        symbolTable = this.checkType(type, currNode, symbolTable);
-        this.numComps = 0;
-    }else if (currNode.getChildren()[0].type === "BOOL") {
+        putMessage("Got Comparison on line "+astNode.children[0].line,1);
+        analyzeBoolExpr(compChild);
+        analyzeBlock(astNode.children[1]);
+    }else if (astNode.children[0].name == 'True'||astNode.children[0].name == 'False') {
         //why is while/if boolVal a thing?????
-        symbolTable = this.checkType("BOOL", currNode.getChildren()[0], symbolTable);
-        this.numComps = 0;
+        putMessage("Got boolVal "+astNode.children[0].name+" on line "+astNode.children[0].line,1);
+        analyzeBlock(astNode.children[1]);
+    }else{
+		putMessage("Error: on line "+astNode.line,0);
+		semErrors++;			
     }
-}//eo analyzeVardecl
+}//eo analyzeIfWhile
+function analyzeBoolExpr(astNode){
+	var left = astNode.children[0];
+	var right = astNode.children[1];
+	var leftEntry;
+	var rightEntry;
+	var isValid= false;
+	if(right.name=='!='||right.name=='=='){
+		analyzeBoolExpr(right);
+	}
+	putMessage("Comparing: "+ analyzeTypeExpr(left)+" vs "+analyzeTypeExpr(right),1);
+	if(analyzeTypeExpr(left)==analyzeTypeExpr(right)){
+		isValid = true;
+	}else{
+		putMessage("Error: Type mismatch on line "+ astNode.line+" Got "+analyzeTypeExpr(left)+" vs "+analyzeTypeExpr(right),0);
+		semErrors++;
+		isValid=false	
+	}
+	return isValid;
+}//eo analyzeBoolExpr
+
+function analyzeTypeExpr(astNode){
+	var type;
+	var name= astNode.name;
+	if(isLetter(name)){
+		var x = lookUpNode(astNode,symbolTable.current);
+		if(x==undefined){
+			//error
+			putMessage("Error: Identifier("+astNode.name+") not found in symbol table ",0);//
+			semErrors++;
+		}else{
+			type = x.type;
+		}
+	}else if(isInt(name)){
+		type = 'Int';
+	}else if(name=='true'|| name=='false'){
+		type = 'Boolean';
+	}else if(name.indexOf('\"')!=-1){
+		type = 'String';
+	}else if(name=='+'){
+		var validIntExpr =analyzeIntExpr(astNode.children[1]);
+		//console.log(yo);
+		if(validIntExpr){
+			type = 'Int'
+		}else{
+			putMessage('HRERER',0)
+
+		}
+	}else if(name=='=='||name=='!='){
+ /*       var compChild = astNode;
+        putMessage("Got Comparison on line "+astNode.line,1);
+        //console.log(analyzeBoolExpr(compChild));
+        if(analyzeBoolExpr(compChild)){
+        	type='Boolean';
+        }*/
+        //analyzeBlock(astNode.children[1]);
+	}else{
+		putMessage("SOMETHING WENT WRONG ON LINE "+astNode.line,0);
+	}
+	return type;
+}//eo analyzeTypeExpr
 
 function analyzePrint(astNode){
 	if(isLetter(astNode.children[0].name)){
@@ -179,8 +249,30 @@ function analyzePrint(astNode){
 		}//eo if else
 	}//eo if
 }//eo analyzePrint
-
-function analyzeNodeType(astNode,id,value){
+function analyzeIntExpr(astNode){
+	var left = astNode.children[0];
+	var right = astNode.children[1];
+	var rightEntry = lookUpNode(right,symbolTable.current);
+	var isValid = false;
+	putMessage("Comparing: "+ left.name+" vs "+right.name,1);
+	if(right.name=='+'){
+		analyzeIntExpr(right);
+	}else if(isInt(left.name)&&isInt(right.name)){
+		putMessage("Int Expression is valid",1);
+		//*****************LATER CHANGE THIS TO A REAL VALUE************************
+		//symbolEntry.value = right.name;
+		isValid = true;
+	}else if(rightEntry!=undefined &&rightEntry.type=='Int'){
+		//do nothing.
+		isValid = true;
+	}else{
+		//putMessage("Error: Type mismatch on line "+astNode.line+" ",0);
+		//semErrors++;
+	}//eo if else
+	return isValid;
+}//eo analyzeIntExpr
+/*
+function analyzeIdType(astNode,id,value){
 	var nodeType = lookUpNode(id,symbolTable.current);
 	var idNode = id;
 	var valNode = value;
@@ -195,8 +287,9 @@ function analyzeNodeType(astNode,id,value){
 				if(value.name=='+'){
 					//if value is a + that means we have operators
 					putMessage("Analyze int expr node on line "+astNode.line,1);
-					analyzeIntExpr(value);
-					nodeType.value=value.name;
+					if(analyzeIntExpr(value)){
+						nodeType.value=value.name;
+					}
 				}else{
 					//otherwise it is a single value and we can just look it up
 					if(isInt(value.name)){
@@ -229,25 +322,7 @@ function analyzeNodeType(astNode,id,value){
 				break;
 		}//eo switch
 	}//eo else if
-}//eo analyzeNodeType
+}//eo analyzeIdType
+*/
 
-function analyzeIntExpr(astNode){
-	var left = astNode.children[0];
-	var right = astNode.children[1];
-	var rightEntry = lookUpNode(right,symbolTable.current);
-	putMessage("Comparing: "+ left.name+" vs "+right.name,1);
-	if(right.name=='+'){
-		analyzeIntExpr(right);
-	}else if(isInt(left.name)&&isInt(right.name)){
-		putMessage("Int Expression is valid",1);
-		//*****************LATER CHANGE THIS TO A REAL VALUE************************
-		//symbolEntry.value = right.name;
-
-	}else if(rightEntry!=undefined &&rightEntry.type=='Int'){
-		//do nothing.
-	}else{
-		putMessage("Error: Type mismatch on line "+astNode.line+" ",0);
-		semErrors++;
-	}//eo if else
-}//eo analyzeIntExpr
 
