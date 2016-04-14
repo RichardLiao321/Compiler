@@ -18,8 +18,43 @@ function buildSymbolTable(astRoot){
     // Make the initial call to expand from the root.
     traverseAST(rt);
     //traverse symboltable tree. check each entry in symbol map. if used=false, make warning,
+	findUnusedId(symbolTable.root);
+	putMessage("**NOTE: If assignment fails, variable is counted as unused**" ,0);
     putMessage("Semantic Analysis completed with "+semErrors+" error(s) and "+semWarnings+" warnings" ,0);
+	buildSymbolTableTable(symbolTable.root);
 }//eo buildSymbolTable
+function findUnusedId(symbolTableRoot){
+	var rt=symbolTableRoot;
+	function traverseSymbolTable(symbolTableNode){
+		for(var z in symbolTableNode.symbolMap){
+			if(symbolTableNode.symbolMap[z].used==false){
+				putMessage("Warning: Unused identifier "+z,0);
+				semWarnings++;
+			}
+		}//eo for
+		for (var i = 0; i < symbolTableNode.children.length; i++){
+			traverseSymbolTable(symbolTableNode.children[i]);
+		}//eo for
+	}//eo traverseSymbolTable()
+	traverseSymbolTable(rt);
+}//buildSymbolTableTable()
+function buildSymbolTableTable(symbolTableRoot){
+	var rt=symbolTableRoot;
+	function traverseSymbolTable(symbolTableNode){
+		printSymbolNode(symbolTableNode);
+		for (var i = 0; i < symbolTableNode.children.length; i++){
+			traverseSymbolTable(symbolTableNode.children[i]);
+		}//eo for
+	}//eo traverseSymbolTable()
+	putMessage("************Symbol Table #"+ p+"***************",0);
+	traverseSymbolTable(rt);
+}//buildSymbolTableTable()
+function printSymbolNode(symbolTableNode){
+	for(var x in symbolTableNode.symbolMap){
+		putMessage("ID: "+x+" Type: "+symbolTableNode.symbolMap[x].type+" Scope: "+symbolTableNode.name+" Line: "+symbolTableNode.symbolMap[x].line,0);
+	}//eo for
+}//eo symbolTableNode
+
 function analyzeBlock(astNode){
 	if(astNode.name=='block'){
 		putMessage("Got block Analyzing: "+astNode.name+" on line "+astNode.line,0);
@@ -102,7 +137,7 @@ function analyzeVardecl(astNode){
 	}else{
 		//add it to symbol table at current scope
 		putMessage("Adding "+idNode.name +" to symbol table with type of "+ valNode.name+" on line "+astNode.line,1);
-		symbolTable.addSymbolEntry(idNode.name,undefined,valNode.name);
+		symbolTable.addSymbolEntry(idNode.name,undefined,valNode.name,astNode.line);
 	}//eo if
 }//eo analyzeVardecl
 
@@ -132,7 +167,8 @@ function analyzeAssign(astNode){
 		var idNodeType= lookUpNode(idNode,symbolTable.current);
 		//*****************LATER CHANGE THIS TO A REAL VALUE************************
 		idNodeType.value = valNode.name;
-	}else if(leftType!=rightType&&leftType!=undefined&&rightType!=undefined){
+		idNodeType.used = true;
+	}else if(leftType!=rightType&&(leftType!=undefined||leftType!='error')&&(rightType!=undefined||leftType!='error')){
 		putMessage("Error: Type mismatch.("+ idNode.name+")"+leftType+" vs ("+ valNode.name+")" + rightType+" on line "+astNode.line ,0);
 		semErrors++;
 	}
@@ -213,8 +249,8 @@ function analyzeIntExpr(astNode){
 	var isValid = false;
 	putMessage("Comparing: "+ left.name+" vs "+right.name,1);
 	if(right.name=='+'){
-		analyzeIntExpr(right);
-	}else if(isInt(left.name)&&isInt(right.name)){
+		return analyzeIntExpr(right);
+	}else if(isInt(left.name)&&analyzeTypeExpr(left)==analyzeTypeExpr(right)){
 		putMessage("Int Expression is valid",1);
 		//*****************LATER CHANGE THIS TO A REAL VALUE************************
 		//symbolEntry.value = right.name;

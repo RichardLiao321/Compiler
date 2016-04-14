@@ -41,12 +41,13 @@
 				this.current = newNode;
 			}//eo if
 		};//eo addSymbolNode
-		this.addSymbolEntry = function(id,value,type){
+		this.addSymbolEntry = function(id,value,type,line){
 			var newEntry = {
 							//id:id,
 							value:value,
 							type:type,
-							used:false
+							used:false,
+							line:line
 			};
 			this.current.symbolMap[id]= newEntry;
 		};//eo addSymbolEntry
