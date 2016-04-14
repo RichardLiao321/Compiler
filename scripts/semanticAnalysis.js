@@ -67,6 +67,7 @@ function analyzeASTNode(astNode){
 	}//eo switch
 }//eo analyzeASTNode
 function lookUpNode(astNode,scope){
+	//console.log("looking up "+astNode.name+" in scope "+scope.name);
 	var currScope = scope;
 	var symbolTableResult = scope.symbolMap[astNode.name];
 	//check current scope for symbol
@@ -106,24 +107,42 @@ function analyzeVardecl(astNode){
 }//eo analyzeVardecl
 
 function analyzeAssign(astNode){
+	//prepare for nested if else hell!
 	var idNode = astNode.children[0];
 	var valNode = astNode.children[1];
-	if(!isLetter(valNode.name)){
-		//check to see if the value for assignment is not an id
-		putMessage("Got Assign. Checking id "+idNode.name+" against value "+valNode.name +" on line "+ astNode.line,1);
-		analyzeNodeType(astNode,idNode,valNode);
-	}else if(isLetter(valNode.name)){
-		//if valNode is an id. check idNode's type against valNode
-		var valNodeType = lookUpNode(valNode,symbolTable.current);
-		var idNodeType = lookUpNode(idNode,symbolTable.current);
-		if(valNodeType==idNodeType){
-			//if two id's match on type it is good
+	var idNodeType= lookUpNode(idNode,symbolTable.current);
+	//check to see if idNode is in symbol table
+	if(idNodeType!=undefined){
+		//check right side, if not ID simple compare
+		if(!isLetter(valNode.name)){
+			putMessage("Got Assign. Checking id "+idNode.name+" against value "+valNode.name +" on line "+ astNode.line,1);
+			analyzeNodeType(astNode,idNode,valNode);
 		}else{
-			//error
-			putMessage("Error: Type mismatch. identifier("+idNode.name+") type "+idNodeType+" expected "+ idNodeType+" got "+"identifier("+valNode.name+") type "+valNodeType,0);
-			semErrors++;
-		}//eo if else
-	}//eo if else
+			//valNode is an ID
+			//look it up and make sure it exists
+			if(lookUpNode(valNode,symbolTable.current)!=undefined){
+				var valNodeType = lookUpNode(valNode,symbolTable.current);
+				//iff exists compare 
+				if(valNodeType.type == idNodeType.type){
+					//two types match
+					//give idNodeType a value
+					putMessage("Valid assignment",1);
+					//*****************LATER CHANGE THIS TO A REAL VALUE************************
+					idNodeType.value = valNode.name;
+				}else{
+					//two types do not match
+					putMessage("Error: Type mismatch. identifier("+idNode.name+") type "+idNodeType.type+" expected "+ idNodeType.type+" got identifier("+valNode.name+") type "+valNodeType.type,0);
+					semErrors++;
+				}//eo if else 3
+			}else{
+				//valNode not in symbol table error
+				putMessage("Error: Identifier("+valNode.name+") not found in symbol table ",0);//
+				semErrors++;
+			}//eo if else 2
+		}//eo if else 1
+	}else{
+		//this should be caught in parse
+	}//eo if else 0
 }//eo analyzeAssign
 
 function analyzeIfWhile(astNode){
@@ -163,41 +182,48 @@ function analyzePrint(astNode){
 
 function analyzeNodeType(astNode,id,value){
 	var nodeType = lookUpNode(id,symbolTable.current);
-	if(nodeType===undefined){
+	var idNode = id;
+	var valNode = value;
+	if(nodeType.type===undefined){
 		//id has no entry
 		//possibly check parent scope
 		putMessage("Error: Identifier("+id.name+") not found in symbol table ",0);//+symbolTable.current.name
 		semErrors++;
-	}else if(nodeType!=undefined){
-		switch(nodeType){
+	}else if(nodeType.type!=undefined){
+		switch(nodeType.type){
 			case 'Int':
 				if(value.name=='+'){
 					//if value is a + that means we have operators
 					putMessage("Analyze int expr node on line "+astNode.line,1);
 					analyzeIntExpr(value);
+					nodeType.value=value.name;
 				}else{
 					//otherwise it is a single value and we can just look it up
 					if(isInt(value.name)){
-						putMessage("Id "+id.name+" is type "+nodeType,1);
+						putMessage("Id "+id.name+" is type "+nodeType.type,1);
+						//set symbolmap value
+						nodeType.value=value.name;
 					}else{
-						putMessage("Error: Type mismatch on line "+ astNode.line+". Id "+id.name+" is type "+nodeType+" got "+value.name,0);
+						putMessage("Error: Type mismatch on line "+ astNode.line+". Id "+id.name+" is type "+nodeType.type+" got "+value.name,0);
 						semErrors++;
 					}//eo if else
 				}//oe if else
 				break;
 			case 'Boolean':
 				if(value.name=='True'||value.name=='False'){
-					putMessage("Id "+id.name+" is type "+nodeType,1);
+					putMessage("Id "+id.name+" is type "+nodeType.type,1);
+					nodeType.value=value.name;
 				}else{
-					putMessage("Error: Type mismatch on line "+ astNode.line+". Id "+id.name+" is type "+nodeType+" got "+value.name,0);
+					putMessage("Error: Type mismatch on line "+ astNode.line+". Id "+id.name+" is type "+nodeType.type+" got "+value.name,0);
 					semErrors++;
 				}
 				break;
 			case 'String':
 				if(value.name[0]=='\"'){
-					putMessage("Id "+id.name+" is type "+nodeType,1);
+					putMessage("Id "+id.name+" is type "+nodeType.type,1);
+					nodeType.value=value.name;
 				}else{
-					putMessage("Error: Type mismatch on line "+ astNode.line+". Id "+id.name+" is type "+nodeType+" got "+value.name,0);
+					putMessage("Error: Type mismatch on line "+ astNode.line+". Id "+id.name+" is type "+nodeType.type+" got "+value.name,0);
 					semErrors++;
 				}
 				break;
@@ -208,12 +234,16 @@ function analyzeNodeType(astNode,id,value){
 function analyzeIntExpr(astNode){
 	var left = astNode.children[0];
 	var right = astNode.children[1];
+	var rightEntry = lookUpNode(right,symbolTable.current);
 	putMessage("Comparing: "+ left.name+" vs "+right.name,1);
 	if(right.name=='+'){
 		analyzeIntExpr(right);
 	}else if(isInt(left.name)&&isInt(right.name)){
 		putMessage("Int Expression is valid",1);
-	}else if(lookUpNode(right,symbolTable.current)=='Int'){
+		//*****************LATER CHANGE THIS TO A REAL VALUE************************
+		//symbolEntry.value = right.name;
+
+	}else if(rightEntry!=undefined &&rightEntry.type=='Int'){
 		//do nothing.
 	}else{
 		putMessage("Error: Type mismatch on line "+astNode.line+" ",0);
