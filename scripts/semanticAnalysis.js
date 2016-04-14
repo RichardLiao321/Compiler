@@ -132,7 +132,7 @@ function analyzeVardecl(astNode){
 	putMessage("Got Vardecl. Checking id "+idNode.name +" against value "+valNode.name+" on line "+ astNode.line,1);
 	if(symbolTable.current.symbolMap[idNode.name]!==undefined){
 		//check to see if current scope has this id already
-		putMessage("Error: Identifier ("+idNode.name+") on line "+astNode.line + " already declared to type "+symbolTable.current.symbolMap[idNode.name],0);
+		putMessage("Error: Identifier ("+idNode.name+") on line "+astNode.line + " already declared to type "+symbolTable.current.symbolMap[idNode.name].type+" for scope "+symbolTable.current.name,0);
 		semErrors++;
 	}else{
 		//add it to symbol table at current scope
@@ -168,7 +168,7 @@ function analyzeAssign(astNode){
 		//*****************LATER CHANGE THIS TO A REAL VALUE************************
 		idNodeType.value = valNode.name;
 		idNodeType.used = true;
-	}else if(leftType!=rightType&&(leftType!=undefined||leftType!='error')&&(rightType!=undefined||leftType!='error')){
+	}else if(leftType!=rightType&&leftType!=undefined&&rightType!=undefined){
 		putMessage("Error: Type mismatch.("+ idNode.name+")"+leftType+" vs ("+ valNode.name+")" + rightType+" on line "+astNode.line ,0);
 		semErrors++;
 	}
@@ -245,19 +245,20 @@ function analyzePrint(astNode){
 function analyzeIntExpr(astNode){
 	var left = astNode.children[0];
 	var right = astNode.children[1];
+	var leftType =analyzeTypeExpr(left);
+	var rightType=analyzeTypeExpr(right);
 	//var rightEntry = lookUpNode(right,symbolTable.current);
 	var isValid = false;
 	putMessage("Comparing: "+ left.name+" vs "+right.name,1);
 	if(right.name=='+'){
 		return analyzeIntExpr(right);
-	}else if(isInt(left.name)&&analyzeTypeExpr(left)==analyzeTypeExpr(right)){
+	}else if(isInt(left.name)&&leftType==rightType){
 		putMessage("Int Expression is valid",1);
 		//*****************LATER CHANGE THIS TO A REAL VALUE************************
 		//symbolEntry.value = right.name;
 		isValid = true;
 	}else if(analyzeTypeExpr(left)!=analyzeTypeExpr(right)){
-		//do nothing.
-		putMessage("Error: Identifier("+right.name+") not found in symbol table ",0);//
+		putMessage("Error: Type mismatch on line "+ astNode.line+" Got "+leftType+" vs "+rightType,0);
 		semErrors++;
 		
 	}
