@@ -5,6 +5,7 @@ function buildSymbolTable(astRoot){
 	var rt=astRoot;
 	semErrors=0;
     semWarnings=0;
+    scope =-1;
     // Recursive function to handle the expansion of the nodes.
     function traverseAST(astNode){
 	        // .. recursively expand them.
@@ -23,6 +24,7 @@ function buildSymbolTable(astRoot){
     putMessage("Semantic Analysis completed with "+semErrors+" error(s) and "+semWarnings+" warnings" ,0);
 	buildSymbolTableTable(symbolTable.root);
 }//eo buildSymbolTable
+
 function findUnusedId(symbolTableRoot){
 	var rt=symbolTableRoot;
 	function traverseSymbolTable(symbolTableNode){
@@ -38,6 +40,7 @@ function findUnusedId(symbolTableRoot){
 	}//eo traverseSymbolTable()
 	traverseSymbolTable(rt);
 }//buildSymbolTableTable()
+
 function buildSymbolTableTable(symbolTableRoot){
 	var rt=symbolTableRoot;
 	function traverseSymbolTable(symbolTableNode){
@@ -49,6 +52,7 @@ function buildSymbolTableTable(symbolTableRoot){
 	putMessage("************Symbol Table #"+ p+"***************",0);
 	traverseSymbolTable(rt);
 }//buildSymbolTableTable()
+
 function printSymbolNode(symbolTableNode){
 	for(var x in symbolTableNode.symbolMap){
 		putMessage("ID: "+x+" Type: "+symbolTableNode.symbolMap[x].type+" Scope: "+symbolTableNode.name+" Line: "+symbolTableNode.symbolMap[x].line,0);
@@ -133,7 +137,7 @@ function analyzeVardecl(astNode){
 	putMessage("Got Vardecl. Checking id "+idNode.name +" against value "+valNode.name+" on line "+ astNode.line,1);
 	if(symbolTable.current.symbolMap[idNode.name]!==undefined){
 		//check to see if current scope has this id already
-		putMessage("Error: Identifier ("+idNode.name+") on line "+astNode.line + " already declared to type "+symbolTable.current.symbolMap[idNode.name].type+" for scope "+symbolTable.current.name,0);
+		putMessage("Error: Id("+idNode.name+") on line "+astNode.line + " already declared to type "+symbolTable.current.symbolMap[idNode.name].type+" for scope "+symbolTable.current.name,0);
 		semErrors++;
 	}else{
 		//add it to symbol table at current scope
@@ -170,6 +174,7 @@ function analyzeAssign(astNode){
 		//*****************LATER CHANGE THIS TO A REAL VALUE************************
 		idNodeType.value = valNode.name;
 		idNodeType.used = true;
+		//check right hand expr for id. Look up ID for value.
 		if(isLetter(valNode.name)){
 			if(valNodeType.value==undefined){
 				putMessage("Warning: Identifier("+valNode.name+") is used before it is initialized for scope "+symbolTable.current.name + " on Line "+valNode.line,0);
