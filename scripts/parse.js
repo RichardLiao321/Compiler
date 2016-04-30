@@ -4,7 +4,7 @@ function parse(){
         // A valid parse derives the PROGRAM production, so begin there.
         parseProgram();
         // Report the results.
-        putMessage("Parsing found " + errorCount + " error(s).",0);        
+        putMessage("Parsing found " + parseErrorCt + " error(s).",0);        
     }//eo parse
 	function lookAhead(){
 		var x = tokenIndex+1;
@@ -32,7 +32,7 @@ function parse(){
 						CST.addNode(st,'leaf',currentToken.line);
 						putMessage('Got: '+currentToken.val,1);
 					}else{
-						errorCount++;
+						parseErrorCt++;
 						putMessage(errorMsg,0);
 					}
 					currentToken = getNextToken();
@@ -43,7 +43,7 @@ function parse(){
 						CST.addNode(currentToken.val,'leaf',currentToken.line);
 						putMessage('Got Type: '+currentToken.type,1);
 					}else{
-						errorCount++;
+						parseErrorCt++;
 						putMessage(errorMsg,0);
 					}
 					currentToken = getNextToken();
@@ -116,7 +116,7 @@ function parse(){
 				//blockStmt
 				break;
 			default:
-				errorCount++;
+				parseErrorCt++;
 				putMessage("Error: unable to parse statement at token index:"+tokenIndex,0);
 				currentToken = getNextToken();
 				break;
@@ -191,7 +191,7 @@ function parse(){
 				//IdExpr
 				break;
 			default:
-				errorCount++;
+				parseErrorCt++;
 				putMessage("Error: unable to parse expr at token index:"+tokenIndex,0);
 				break;
 		}

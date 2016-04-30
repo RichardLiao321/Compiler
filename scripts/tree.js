@@ -21,6 +21,7 @@
 				this.current = newNode;
 			}//eo if
 		}//eo addNode
+		//SYMBOL TABLE
 		this.addSymbolNode = function(name,kind,line){
 			var newNode = {
 							name:name,
@@ -51,6 +52,7 @@
 			};
 			this.current.symbolMap[id]= newEntry;
 		};//eo addSymbolEntry
+		////////////////////////////////////////////////
 		this.endChildren = function(){
 			// ... by moving "up" to our parent node (if possible).
 			if ((this.current.parent !== null) && (this.current.parent.name !== undefined)){

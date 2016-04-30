@@ -90,6 +90,7 @@
 	<script type="text/javascript" src="scripts/parse.js"></script>
 	<script type="text/javascript" src="scripts/tree.js"></script>
 	<script type="text/javascript" src="scripts/semanticAnalysis.js"></script>
+	<script type="text/javascript" src="scripts/codeGeneration.js"></script>
 	<link rel="stylesheet" href="treant-js-master/Treant.css" type="text/css"/>
 	<script src="treant-js-master/vendor/raphael.js"></script>
     <script src="treant-js-master/Treant.js"></script>
@@ -98,17 +99,17 @@
     var tokens = [];
     var tokenIndex = 0;
     var currentToken = "";
-    var errorCount = 0;
     var EOF = "$";
 	var CST = new tree();
 	var AST = new tree();
+	var parseErrorCt=0;
 
     function init() {
         // Set the initial values for our globals.
         tokens = [];
         tokenIndex = 0;
         currentToken = ' ';
-        errorCount = 0;
+        parseErrorCt=0;
 		inString=false;
 		ct=0;
 		CST = new tree();
@@ -157,6 +158,10 @@
 			if(lexErrors==0){
 				putMessage("--------Parsing Program #"+p+"-------",0);
 				parse();
+				//putMessage(symbolTable.toString(),0);
+				//buildSymbolTableTable(symbolTable.root);
+			}//eo if
+			if(parseErrorCt==0){
 				putMessage("------------CST #"+p+"----------",0);
 				putMessage(CST.toString(),0);
 				//putMessage("************CST TO AST OUTPUT********************",0);
@@ -165,9 +170,7 @@
 				putMessage(AST.toString(),0);
 				putMessage("------------Semantic Analysis #"+p+"----------",0);
 				buildSymbolTable(AST.root);
-				//putMessage(symbolTable.toString(),0);
-				//buildSymbolTableTable(symbolTable.root);
-			}//eo if
+			}
 			putMessage("******************************************",0);
         }//eo for
     }

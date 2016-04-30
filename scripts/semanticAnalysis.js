@@ -28,7 +28,7 @@ function findUnusedId(symbolTableRoot){
 	function traverseSymbolTable(symbolTableNode){
 		for(var z in symbolTableNode.symbolMap){
 			if(symbolTableNode.symbolMap[z].used==false){
-				putMessage("Warning: Unused identifier "+z,0);
+				putMessage("Warning: Unused identifier "+z+" for scope "+symbolTableNode.name,0);
 				semWarnings++;
 			}
 		}//eo for
@@ -109,6 +109,7 @@ function lookUpNode(astNode,scope){
 	if(symbolTableResult!=undefined){
 		//if it exists in current scope return
 		putMessage("Found "+astNode.name+" in scope "+currScope.name+" with type "+symbolTableResult.type,1);
+		//astNode.used=true;
 		return symbolTableResult;
 	}else{
 		//else check parents until root
@@ -165,9 +166,17 @@ function analyzeAssign(astNode){
 	if(leftType==rightType){
 		putMessage("Valid assignment",1);
 		var idNodeType= lookUpNode(idNode,symbolTable.current);
+		var valNodeType= lookUpNode(valNode,symbolTable.current);
 		//*****************LATER CHANGE THIS TO A REAL VALUE************************
 		idNodeType.value = valNode.name;
 		idNodeType.used = true;
+		if(isLetter(valNode.name)){
+			if(valNodeType.value==undefined){
+				putMessage("Warning: Identifier("+valNode.name+") is used before it is initialized for scope "+symbolTable.current.name + " on Line "+valNode.line,0);
+				semWarnings++;
+			}
+		}
+
 	}else if(leftType!=rightType&&leftType!=undefined&&rightType!=undefined){
 		putMessage("Error: Type mismatch.("+ idNode.name+")"+leftType+" vs ("+ valNode.name+")" + rightType+" on line "+astNode.line ,0);
 		semErrors++;
@@ -198,6 +207,7 @@ function analyzeTypeExpr(astNode){
 	var name= astNode.name;
 	//console.log(astNode.name);
 	if(isLetter(name)){
+		//console.log("name: "+name);
 		var x = lookUpNode(astNode,symbolTable.current);
 		if(x==undefined){
 			//error
@@ -205,6 +215,7 @@ function analyzeTypeExpr(astNode){
 			semErrors++;
 			return 'error';
 		}else{
+			x.used=true;
 			type = x.type;
 		}
 	}else if(isInt(name)){
