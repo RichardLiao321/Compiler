@@ -91,6 +91,7 @@
 	<script type="text/javascript" src="scripts/tree.js"></script>
 	<script type="text/javascript" src="scripts/semanticAnalysis.js"></script>
 	<script type="text/javascript" src="scripts/codeGeneration.js"></script>
+	<script type="text/javascript" src="scripts/runEnv.js"></script>
 	<link rel="stylesheet" href="treant-js-master/Treant.css" type="text/css"/>
 	<script src="treant-js-master/vendor/raphael.js"></script>
     <script src="treant-js-master/Treant.js"></script>
@@ -102,6 +103,7 @@
     var EOF = "$";
 	var CST = new tree();
 	var AST = new tree();
+	var runTime = new runEnv();
 	var parseErrorCt=0;
 
     function init() {
@@ -114,6 +116,7 @@
 		ct=0;
 		CST = new tree();
 		AST = new tree();
+		runTime = new runEnv();
 		symbolTable = new tree();
 		scope =-1;
     }
@@ -160,6 +163,8 @@
 				parse();
 				//putMessage(symbolTable.toString(),0);
 				//buildSymbolTableTable(symbolTable.root);
+			}else{
+				return;
 			}//eo if
 			if(parseErrorCt==0){
 				putMessage("------------CST #"+p+"----------",0);
@@ -170,6 +175,17 @@
 				putMessage(AST.toString(),0);
 				putMessage("------------Semantic Analysis #"+p+"----------",0);
 				buildSymbolTable(AST.root);
+				putMessage("******************************************",0);
+			}else{
+				return;
+			}
+			if(semErrors==0){
+				putMessage("--------Code Gen Program #"+p+"-------",0);
+				generateCode(AST.root);
+				runTime.toString();
+				staticTabletoString();
+			}else{
+				return;
 			}
 			putMessage("******************************************",0);
         }//eo for

@@ -114,8 +114,8 @@
 	];//eo matrix. Ne(m)o not found :(
 	
 	var state;//global DFA position variable
-	var lexErrors = 0;
-	var lexWarnings = 0;
+	var lexErrors;
+	var lexWarnings;
 
 	/*Token Class*/
 	function token(type,val,line){

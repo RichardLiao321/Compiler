@@ -281,4 +281,21 @@ function analyzeIntExpr(astNode){
 	return isValid;
 }//eo analyzeIntExpr
 
+//find a return the node that matches the param
+function findSymbolScope(scopeToFind){
+	var symbolRoot = symbolTable.root;
+	var s;
+	function traverseSymbolTable(symbolTableNode){
+		//console.log(symbolTableNode.name +" vs "+scopeToFind);
+		if(symbolTableNode.name==scopeToFind.toString()){
+				s = symbolTableNode;
+		}					
+		for (var i = 0; i < symbolTableNode.children.length; i++){
+			traverseSymbolTable(symbolTableNode.children[i]);
+		}//eo for
+	}//eo traverseSymbolTable()
+	traverseSymbolTable(symbolRoot);
+	return s;
+}//eo findSymbolScope
+
 
