@@ -56,7 +56,11 @@ function checkNextChar(str, start, num){
 //simple function to check if a string(char) is only letters
 function isLetter(str) {
 	//console.log("letter???: "+str)
-	return /^[a-z]+$/.test(str);
+	 if(/^[a-z]+$/.test(str) &&str.length==1){
+        return true
+     }else{
+        return false
+     }
 }//eo lookAhead
 function testPrograms(progNo){
 	if(progNo == 1){
@@ -87,3 +91,12 @@ function isInt(x) {
    var y = parseInt(x, 10);
    return !isNaN(y) && x == y && x.toString() == y.toString();
 }//eo isInt
+
+decimalToHex = function (dec) {
+    var hex = dec.toString(16);
+    //pad result if needed
+    if (hex.length === 1) {
+        hex = "0" + hex;
+    }
+    return hex.toUpperCase();
+};//eo decimalToHex

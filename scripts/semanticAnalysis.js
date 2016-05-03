@@ -121,13 +121,14 @@ function lookUpNode(astNode,scope){
 			//loop until at root
 			currScope=currScope.parent;
 			putMessage("checking scope: "+currScope.name+" for "+astNode.name,1);
-			var symbolTableResult = currScope.symbolMap[astNode.name];
+			symbolTableResult = currScope.symbolMap[astNode.name];
 			if(symbolTableResult!=undefined){
 				//if not undefined then symbol found
 				putMessage("Found "+astNode.name+" in scope "+currScope.name+" with type "+symbolTableResult.type,1);
-				return symbolTableResult;
+				
 			}//eo if
 		}//eo while
+		return symbolTableResult;
 	}//eo if else
 }//eo analyzeASTNode
 
@@ -142,7 +143,7 @@ function analyzeVardecl(astNode){
 	}else{
 		//add it to symbol table at current scope
 		putMessage("Adding "+idNode.name +" to symbol table with type of "+ valNode.name+" on line "+astNode.line,1);
-		symbolTable.addSymbolEntry(idNode.name,undefined,valNode.name,astNode.line);
+		symbolTable.addSymbolEntry(idNode.name,undefined,valNode.name,astNode.line,symbolTable.current.name);
 	}//eo if
 }//eo analyzeVardecl
 
