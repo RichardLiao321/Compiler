@@ -93,7 +93,7 @@ function generateASTNode(astNode){
             var leftType = astNode.children[0].name;
             varCt++;
             if(leftType=='Int'){
-                //load accumulator with 00. i.e initialize int to 0.
+				//load accumulator with 00. i.e initialize int to 0.
                 runTime.addCode('A9');
                 runTime.addCode('00');
                 //store temp address in accumulator
@@ -133,14 +133,35 @@ function generateASTNode(astNode){
                 leftType = leftSymbolEntry.type;//look up from symbol table. POTENTIAL PROBLEM? id not in current scope
                 //Left is ID with type int, right is digit TODO right is 1+1+1+b??
                 if(leftType=='Int'&&!isLetter(right.name)){
-                    //HOW TO EVALUATE 1+2+3+b????
-                    var val = parseInt(right);
-                    var tempVal = staticTableLookUp(left.name,leftSymbolEntry.scope);
-                    runTime.addCode('A9');
-                    runTime.addCode('0'+right.name);
-                    runTime.addCode('8D');
-                    runTime.addCode(tempVal.temp);
-                    runTime.addCode('XX');
+					if(astNode.children[1].name=='+'){
+						var x = generateIntExpr(astNode);
+						var val = x[0];
+						if(x[1]!=undefined){//there is an id at the end of int expr chain
+							var rightSymbolEntry = lookUpNode(x[1],checkScope);
+							var rightTemp = staticTableLookUp(x[1].name,rightSymbolEntry.scope);
+							runTime.addCode('A9');
+							//
+							//if(val.toString().length>1)
+							runTime.addCode('0'+decimalToHex(val));
+							runTime.addCode('8D');
+							runTime.addCode(rightTemp.temp);
+							runTime.addCode('XX');
+						}else{//no id at end of it expr chain
+							runTime.addCode('A9');
+							runTime.addCode('0'+val);
+							runTime.addCode('8D');
+							runTime.addCode(rightTemp.temp);
+							runTime.addCode('XX');
+						}//eo if else
+					}else{
+						var val = parseInt(right);
+						var tempVal = staticTableLookUp(left.name,leftSymbolEntry.scope);
+						runTime.addCode('A9');
+						runTime.addCode('0'+right.name);
+						runTime.addCode('8D');
+						runTime.addCode(tempVal.temp);
+						runTime.addCode('XX');
+					}
                 }else if(leftType =='String'&&!isLetter(right.name)){
                     var strippedVal = right.name.substring(1,right.name.length-1);
                     //loop over string backwards. Add at heapPointer. Deciment heapPointer.
@@ -209,7 +230,31 @@ function generateASTNode(astNode){
             return;
     }//eo switch
 }//eo generateASTNode
-
+function generateIntExpr(astNode){
+	var left  = astNode.children[0];
+	var right = astNode.children[1];
+	var total = 0;
+	var id;
+	function getTotal(plusNode){
+		var plusLeft = plusNode.children[0];
+		var plusRight = plusNode.children[1];
+		//console.log(plusLeft.name + " and  "+plusRight.name );
+		if(isInt(plusLeft.name)){
+			total+=parseInt(plusLeft.name);
+		}
+		if(isInt(plusRight.name)){
+			total+=parseInt(plusRight.name);
+		}else if(isLetter(plusRight.name)){
+			id=plusRight;
+		}
+		if(plusRight.name=='+'){
+			getTotal(plusRight);
+		}
+	}//eo getTotal
+	getTotal(astNode);
+	//console.log(total);
+	return [total,id];
+}//eo generateIntExpr
 //look up a var at a scope, return the entry
 function staticTableLookUp(varName,vScope){
     var ret;
