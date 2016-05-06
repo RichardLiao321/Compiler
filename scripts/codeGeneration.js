@@ -10,14 +10,18 @@ var jumpTable={};
 var tempCt;
 var varScope = -1;
 //Add an entry to the static table.
-function addStaticEntry(temp,variable,scope,address){
+function addStaticEntry(temp,variable,scope,offset,address){
     var newStatic = {
         temp:temp,//temp is just T0. Not T0 XX
         variable:variable,
         scope:scope,
+        offset:offset,
         address:address,
+        setAddress:function(hex){
+            this.address=hex;
+        },
         toString:function(){
-            putMessage("Temp: "+temp+" Var: "+variable + " scope: "+scope +" address: "+address,1);
+            putMessage("Temp: "+temp+" Var: "+variable + " scope: "+scope +" offset: "+offset+" address: "+address,1);
         }
     };
     //index entries on varName and scope combo.
@@ -64,8 +68,10 @@ function generateCode(astRoot){
     // Make the initial call to expand from the root.
     traverseAST(rt);
     runTime.addCode('00');
+    //syscall to start static area
     //back patch addresses.
     backPatch();
+    //staticTabletoString();
 }//eo generateCode
 
 function generateBlock(astNode){
@@ -95,11 +101,19 @@ function generateASTNode(astNode){
                 runTime.addCode('T'+varCt);
                 runTime.addCode('XX');
                 //add entry to static table
-                addStaticEntry('T'+varCt,astNode.children[1].name,varScope,varCt);
+                addStaticEntry('T'+varCt,astNode.children[1].name,varScope,varCt,0);
             }else if(leftType=='String'){
-
+                addStaticEntry('T'+varCt,astNode.children[1].name,varScope,varCt,0);
             }else if(leftType=='Boolean'){
-
+                //load accumulator with 00. i.e initialize int to 0.
+                runTime.addCode('A9');
+                runTime.addCode('00');
+                //store temp address in accumulator
+                runTime.addCode('8D');
+                runTime.addCode('T'+varCt);
+                runTime.addCode('XX');
+                //add entry to static table
+                addStaticEntry('T'+varCt,astNode.children[1].name,varScope,varCt,0);
             }else{
                 putMessage("Unknown var decl type: "+astNode.children[0],0);
                 return;
@@ -117,8 +131,6 @@ function generateASTNode(astNode){
                 leftSymbolEntry = lookUpNode(left,checkScope);
                 //console.log(leftSymbolEntry);
                 leftType = leftSymbolEntry.type;//look up from symbol table. POTENTIAL PROBLEM? id not in current scope
-
-                //console.log(lookUpNode(left,checkScope));
                 //Left is ID with type int, right is digit TODO right is 1+1+1+b??
                 if(leftType=='Int'&&!isLetter(right.name)){
                     //HOW TO EVALUATE 1+2+3+b????
@@ -126,17 +138,31 @@ function generateASTNode(astNode){
                     var tempVal = staticTableLookUp(left.name,leftSymbolEntry.scope);
                     runTime.addCode('A9');
                     runTime.addCode('0'+right.name);
-                    //var g = parseInt(right.name).toString(16)
-                    //console.log(parseInt(g,16));
                     runTime.addCode('8D');
-                    //staticTabletoString();
-                    //console.log(tempVal);
                     runTime.addCode(tempVal.temp);
                     runTime.addCode('XX');
                 }else if(leftType =='String'&&!isLetter(right.name)){
+                    var strippedVal = right.name.substring(1,right.name.length-1);
+                    //loop over string backwards. Add at heapPointer. Deciment heapPointer.
+                    //at end of string, get location, convert to hex. Add to accumulator.
+
 
                 }else if(leftType =='Boolean'&&!isLetter(right.name)){
-
+                    var val = parseInt(right);
+                    var boolVal;
+                    if(right.name=='True'){
+                        boolVal=1
+                    }else if(right.name=='False'){
+                        boolVal=0
+                    }else{
+                        console.log("you broke me :(");
+                    }
+                    var tempVal = staticTableLookUp(left.name,leftSymbolEntry.scope);
+                    runTime.addCode('A9');
+                    runTime.addCode('0'+boolVal);
+                    runTime.addCode('8D');
+                    runTime.addCode(tempVal.temp);
+                    runTime.addCode('XX');
 
                 }else if(isLetter(right.name)){
                     //right hand is an id. we know types match from sem analysis
@@ -210,32 +236,32 @@ function backPatch(){
         // All temp variables start with T
         if (currByte[0]==='T'){
             //var substringIndex = parseInt(currByte.substring(1), 10);
-            var tempTableEntry = staticTable[currByte];
-            var newIndex = staticArea + parseInt(tempTableEntry.address);
-            var hexLocation = decimalToHex(newIndex);
+            var staticTableEntry = staticTable[currByte];
+            var newIndex = staticArea + parseInt(staticTableEntry.offset);
+            var hexAddress = decimalToHex(newIndex);
 
             if (newIndex < runTime.heapPointer) {
                 //if newIndex does not have a collision with heap starting point
-                putMessage("Resolved entry of " + currByte + " to: " + hexLocation);
-                //tempTableEntry.address = hexLocation; THIS BREAKS WHY DO I HAVE THIS
-                this.setCodeAtIndex(hexLocation, index);
+                putMessage("Resolved entry of " + currByte + " to: " + hexAddress,1);
+                staticTableEntry.setAddress(hexAddress);//This does not work for some reason.
+                this.setCodeAtIndex(hexAddress, index);
                 this.setCodeAtIndex("00", index + 1);
             }else{
-                var errorMessage = "Error: static area conflicting with heap at " + decimalToHex(runTime.heapPointer) + ". " + tempTableEntry.temp + " was resolved to address " + hexLocation;
+                var errorMessage = "Error: static area conflicting with heap at " + decimalToHex(runTime.heapPointer) + ". " + tempTableEntry.temp + " was resolved to address " + hexAddress;
                 putMessage(errorMessage,0);
                 codeGenErrors++;
-            }
+            }//eo if else
         }else if (currByte[0]==='J'){
             var substringIndex = parseInt(currByte.substring(1), 10);
             var jumpTableEntry = jumpTable[substringIndex];
 
             var distanceToJump = decimalToHex(jumpTableEntry.dist);
 
-            putMessage("Resolving jump entry of " + currByte + " to: " + distanceToJump,0);
+            putMessage("Resolving jump entry of " + currByte + " to: " + distanceToJump,1);
 
             this.setCodeAtIndex(distanceToJump, index);
         }else{
-            putMessage("SOMETHING WENT VERY VERY WRONG",0);
+            //putMessage("SOMETHING WENT VERY VERY WRONG",0);
         }//eo if else
     }//eo for
 }//eo backPatch

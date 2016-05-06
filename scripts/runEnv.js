@@ -1,7 +1,7 @@
 function runEnv(){
 	this.length =256;
 	this.programCounter=0;
-	this.heapPointer=256;
+	this.heapPointer=255;
 	this.env=[];
 	//add "code" to "env"
 	this.addCode = function(opCode){
