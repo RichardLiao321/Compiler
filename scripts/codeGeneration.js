@@ -122,17 +122,47 @@ function generateASTNode(astNode){
                 //Left is ID with type int, right is digit TODO right is 1+1+1+b??
                 if(leftType=='Int'&&!isLetter(right.name)){
                     //HOW TO EVALUATE 1+2+3+b????
-                    var val = parseInt(right);
                     var tempVal = staticTableLookUp(left.name,leftSymbolEntry.scope);
-                    runTime.addCode('A9');
-                    runTime.addCode('0'+right.name);
-                    runTime.addCode('8D');
-                    runTime.addCode(tempVal.temp);
-                    runTime.addCode('XX');
+                    if(right.name!='+'){
+                        var val = parseInt(right);
+                        runTime.addCode('A9');
+                        runTime.addCode('0'+right.name);
+                        runTime.addCode('8D');
+                        runTime.addCode(tempVal.temp);
+                        runTime.addCode('XX');
+                    }else if(right.name=='+'){
+                        var results = generateIntExpr(astNode);
+                        var intExprTotal = results[0];
+                        var id = results[1];
+                        //ADD THE TOTAL TO CODE
+                        runTime.addCode('A9');
+                        runTime.addCode(decimalToHex(intExprTotal));
+                        runTime.addCode('8D');
+                        runTime.addCode(tempVal.temp);
+                        runTime.addCode('XX');
+                        // IF THERE IS AN ID, PERFORM ADD WITH CARRIES
+                        if(id != undefined){// id at the end of int expr
+                            rightSymbolEntry = lookUpNode(id,checkScope);
+                            var leftTemp  = staticTableLookUp(left.name,leftSymbolEntry.scope).temp
+                            //find the temp value for id and scope
+                            var rightTemp = staticTableLookUp(id.name,rightSymbolEntry.scope).temp;
+                            //load accumulator with left's stuff
+                            runTime.addCode('AD');
+                            runTime.addCode(leftTemp);
+                            runTime.addCode('XX');
+                            //SUM WITH RIGHT'S ADDRESS
+                            runTime.addCode('6D');
+                            runTime.addCode(rightTemp);
+                            runTime.addCode('XX');
+                            //store at left's address
+                            runTime.addCode('8D');
+                            runTime.addCode(leftTemp);
+                            runTime.addCode('XX');
+                        }//eo if else
+                    }//eo if else
                 }else if(leftType =='String'&&!isLetter(right.name)){
                     var strippedVal = right.name.substring(1,right.name.length-1);
                     writeStringToMemory(strippedVal);
-                    //console.log(runTime.heapPointer);
                     //at end of string, get location, convert to hex. Add to accumulator.
                     var hexHeapPointer = decimalToHex(runTime.heapPointer);
                     var tempVal = staticTableLookUp(left.name,leftSymbolEntry.scope);
@@ -178,20 +208,6 @@ function generateASTNode(astNode){
             }//eo if else
             break;
         case 'print':
-        /*
-            var val = astNode.children[0];
-            var checkScope = findSymbolScope(varScope);//get current scope from symbol table
-            if(isLetter(val.name)){
-                //printing ID
-                var valSymbolEntry = lookUpNode(val,checkScope);//Get the symbol table entry for id
-                var tempVal = staticTableLookUp(val.name,valSymbolEntry.scope);//get the static table entry's temp val
-                runTime.addCode('AC');
-                runTime.addCode(tempVal.temp);
-                runTime.addCode('XX');
-                runTime.addCode('A2');
-                runTime.addCode('02');
-                runTime.addCode('FF');
-            }*/
             generatePrint(astNode);
             break;
         case 'if':
@@ -316,7 +332,6 @@ function generatePrint(astNode){
         runTime.addCode('AC');
         runTime.addCode(tempVal.temp);
         runTime.addCode('XX');
-
         var type = valSymbolEntry.type;
         if(type =='Int' || type == 'Boolean'){
             runTime.addCode('A2');
@@ -351,6 +366,7 @@ function addCodeAtIndex(code,index){
     }//eo if else
 }//eo addCodeAtIndex
 
+//write a given string to memory
 function writeStringToMemory(asciiString){
     runTime.writeToHeap('00');//always write 00 after a string to divide them.
     //loop over string backwards. Add at heapPointer. Deciment heapPointer.
@@ -360,3 +376,29 @@ function writeStringToMemory(asciiString){
         runTime.writeToHeap(hex.toUpperCase());
     }//eo for
 }//eo writeStringToMemory
+
+function generateIntExpr(astNode){
+    var left  = astNode.children[0];
+    var right = astNode.children[1];
+    var total = 0;
+    var id;
+    function traverseIntTree(plusNode){
+        var plusLeft = plusNode.children[0];
+        var plusRight = plusNode.children[1];
+        //console.log(plusLeft.name + " and  "+plusRight.name );
+        if(isInt(plusLeft.name)){
+            total+=parseInt(plusLeft.name);
+        }
+        if(isInt(plusRight.name)){
+            total+=parseInt(plusRight.name);
+        }else if(isLetter(plusRight.name)){
+            id=plusRight;
+        }
+        if(plusRight.name=='+'){
+            traverseIntTree(plusRight);
+        }
+    }//eo getTotal
+    traverseIntTree(astNode);
+    return [total,id];
+}//eo generateIntExpr
+
