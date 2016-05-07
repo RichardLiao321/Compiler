@@ -21,7 +21,7 @@ function addStaticEntry(temp,variable,scope,offset,address){
             this.address=hex;
         },
         toString:function(){
-            putMessage("Temp: "+temp+" Var: "+variable + " scope: "+scope +" offset: "+offset+" address: "+address,1);
+            putMessage('Temp: '+temp+' Var: '+variable + ' scope: '+scope +' offset: '+offset+' address: '+address,1);
         }
     };
     //index entries on varName and scope combo.
@@ -31,7 +31,7 @@ function addStaticEntry(temp,variable,scope,offset,address){
 };//eo addSymbolEntry
 //print static table
 function staticTabletoString(){
-    putMessage("printing static table....",1);
+    putMessage('printing static table....',1);
     //console.log(Object.keys(staticTable).length)//0;
     for(var i = 0; i<Object.keys(staticTable).length;i++){
         staticTable['T'+i].toString();
@@ -42,7 +42,7 @@ function addJumpEntry(temp,dist){
     var newJump = {
         dist:dist,
         toString:function(){
-            putMessage("Temp: "+temp+" dist: "+variable,1);
+            putMessage('Temp: '+temp+' dist: '+variable,1);
         }
     };
     //jumpTable[temp]=newJump;
@@ -92,19 +92,7 @@ function generateASTNode(astNode){
         case 'vardecl':
             var leftType = astNode.children[0].name;
             varCt++;
-            if(leftType=='Int'){
-                //load accumulator with 00. i.e initialize int to 0.
-                runTime.addCode('A9');
-                runTime.addCode('00');
-                //store temp address in accumulator
-                runTime.addCode('8D');
-                runTime.addCode('T'+varCt);
-                runTime.addCode('XX');
-                //add entry to static table
-                addStaticEntry('T'+varCt,astNode.children[1].name,varScope,varCt,0);
-            }else if(leftType=='String'){
-                addStaticEntry('T'+varCt,astNode.children[1].name,varScope,varCt,0);
-            }else if(leftType=='Boolean'){
+            if(astNode.children[0]!=undefined){//leftType=='Int'
                 //load accumulator with 00. i.e initialize int to 0.
                 runTime.addCode('A9');
                 runTime.addCode('00');
@@ -115,9 +103,9 @@ function generateASTNode(astNode){
                 //add entry to static table
                 addStaticEntry('T'+varCt,astNode.children[1].name,varScope,varCt,0);
             }else{
-                putMessage("Unknown var decl type: "+astNode.children[0],0);
-                return;
-            }//eo if else
+
+                console.log('aserhar');
+            }
             break;
         case 'assign':
             var checkScope = findSymbolScope(varScope);//get current scope in symbol table
@@ -143,10 +131,16 @@ function generateASTNode(astNode){
                     runTime.addCode('XX');
                 }else if(leftType =='String'&&!isLetter(right.name)){
                     var strippedVal = right.name.substring(1,right.name.length-1);
-                    //loop over string backwards. Add at heapPointer. Deciment heapPointer.
+                    writeStringToMemory(strippedVal);
+                    //console.log(runTime.heapPointer);
                     //at end of string, get location, convert to hex. Add to accumulator.
-
-
+                    var hexHeapPointer = decimalToHex(runTime.heapPointer);
+                    var tempVal = staticTableLookUp(left.name,leftSymbolEntry.scope);
+                    runTime.addCode('A9');
+                    runTime.addCode(hexHeapPointer);
+                    runTime.addCode('8D');
+                    runTime.addCode(tempVal.temp);
+                    runTime.addCode('XX');
                 }else if(leftType =='Boolean'&&!isLetter(right.name)){
                     var val = parseInt(right);
                     var boolVal;
@@ -155,7 +149,7 @@ function generateASTNode(astNode){
                     }else if(right.name=='False'){
                         boolVal=0
                     }else{
-                        console.log("you broke me :(");
+                        console.log('you broke me :(');
                     }
                     var tempVal = staticTableLookUp(left.name,leftSymbolEntry.scope);
                     runTime.addCode('A9');
@@ -177,13 +171,14 @@ function generateASTNode(astNode){
                     runTime.addCode(leftTemp);
                     runTime.addCode('XX');
                 }else{
-                    putMessage("type not recognized "+leftType,0);
+                    putMessage('type not recognized '+leftType,0);
                 }//eo if else
             }else{
-                putMessage("Scope: "+varScope+" not found",0);
+                putMessage('Scope: '+varScope+' not found',0);
             }//eo if else
             break;
         case 'print':
+        /*
             var val = astNode.children[0];
             var checkScope = findSymbolScope(varScope);//get current scope from symbol table
             if(isLetter(val.name)){
@@ -194,9 +189,10 @@ function generateASTNode(astNode){
                 runTime.addCode(tempVal.temp);
                 runTime.addCode('XX');
                 runTime.addCode('A2');
-                runTime.addCode('01');
+                runTime.addCode('02');
                 runTime.addCode('FF');
-            }
+            }*/
+            generatePrint(astNode);
             break;
         case 'if':
         jumpCt++;
@@ -205,7 +201,7 @@ function generateASTNode(astNode){
         jumpCt++;
             break;
         default:
-            putMessage("Unknown node type: "+astNode.name,0);
+            putMessage('Unknown node type: '+astNode.name,0);
             return;
     }//eo switch
 }//eo generateASTNode
@@ -215,7 +211,7 @@ function staticTableLookUp(varName,vScope){
     var ret;
     //ret = staticTable[varName+vScope];
     for(var y = 0;y<Object.keys(staticTable).length;y++){
-        //console.log(staticTable['T'+y].variable+" vs "+varName+ " @ scope: "+staticTable['T'+y].scope+" vs "+vScope);
+        //console.log(staticTable['T'+y].variable+' vs '+varName+ ' @ scope: '+staticTable['T'+y].scope+' vs '+vScope);
         if(staticTable['T'+y].variable == varName && staticTable['T'+y].scope==vScope){
             ret = staticTable['T'+y];
             //console.log(ret.temp);
@@ -226,9 +222,9 @@ function staticTableLookUp(varName,vScope){
 
 //after all stuff has been read in, replace all temp addresses with proper addresses
 function backPatch(){
-    putMessage("Backpatching code.....",1);
+    putMessage('Backpatching code.....',1);
     //staticTabletoString();
-    var currByte = "";
+    var currByte = '';
     var staticArea = runTime.programCounter;
     for (var index = 0; index < staticArea; index++) {
         currByte = runTime.env[index];
@@ -242,12 +238,12 @@ function backPatch(){
 
             if (newIndex < runTime.heapPointer) {
                 //if newIndex does not have a collision with heap starting point
-                putMessage("Resolved entry of " + currByte + " to: " + hexAddress,1);
+                putMessage('Resolved entry of ' + currByte + ' to: ' + hexAddress,1);
                 staticTableEntry.setAddress(hexAddress);//This does not work for some reason.
-                this.setCodeAtIndex(hexAddress, index);
-                this.setCodeAtIndex("00", index + 1);
+                this.addCodeAtIndex(hexAddress, index);
+                this.addCodeAtIndex('00', index + 1);
             }else{
-                var errorMessage = "Error: static area conflicting with heap at " + decimalToHex(runTime.heapPointer) + ". " + tempTableEntry.temp + " was resolved to address " + hexAddress;
+                var errorMessage = 'Error: static area conflicting with heap at ' + decimalToHex(runTime.heapPointer) + '. ' + tempTableEntry.temp + ' was resolved to address ' + hexAddress;
                 putMessage(errorMessage,0);
                 codeGenErrors++;
             }//eo if else
@@ -257,20 +253,110 @@ function backPatch(){
 
             var distanceToJump = decimalToHex(jumpTableEntry.dist);
 
-            putMessage("Resolving jump entry of " + currByte + " to: " + distanceToJump,1);
+            putMessage('Resolving jump entry of ' + currByte + ' to: ' + distanceToJump,1);
 
-            this.setCodeAtIndex(distanceToJump, index);
+            this.addCodeAtIndex(distanceToJump, index);
         }else{
-            //putMessage("SOMETHING WENT VERY VERY WRONG",0);
+            //putMessage('SOMETHING WENT VERY VERY WRONG',0);
         }//eo if else
     }//eo for
 }//eo backPatch
+function generatePrint(astNode){
+    var childNode = astNode.children[0];
+    //console.log(childNode.name);
+    // Integer addition
+    if (isInt(childNode.name)) {//print digit DONE
+        putMessage('Print: digit',1);
+        runTime.addCode('A0');
+        runTime.addCode('0' + childNode.name);
+        runTime.addCode('A2');
+        runTime.addCode('01');
+        runTime.addCode('FF');
+    }else if(childNode.name =='+') {
+        putMessage('Print: Int operation',1);
+        var addressesToAdd = [];
+        addressesToAdd = runTime.insertAddLocations(childNode, addressesToAdd);
+        var addressOfSum = runTime.insertAddCode(addressesToAdd);
+        var firstByte = addressOfSum.split(' ')[0];
+        var secondByte = addressOfSum.split(' ')[1];
 
-function setCodeAtIndex(code,index){
+        runTime.addCode('AC');
+        runTime.addCode(firstByte);
+        runTime.addCode(secondByte);
+        runTime.addCode('A2');
+        runTime.addCode('01');
+        runTime.addCode('FF');
+    }else if(childNode.name.indexOf('\"')!=-1) {//String DONE
+        var strippedString = childNode.name.substring(1,childNode.name.length-1);
+        writeStringToMemory(strippedString);
+        runTime.addCode('A0');
+        runTime.addCode(decimalToHex(runTime.heapPointer));
+        runTime.addCode('A2');
+        runTime.addCode('02');
+        runTime.addCode('FF');
+    }else if (childNode.name=='!='||childNode.name=='==') {
+        putMesssage('Print: comparison');
+
+        var address = runTime.generateBooleanExpr(childNode);
+
+        var firstByte = address.split(' ')[0];
+        var secondByte = address.split(' ')[1];
+        runTime.addCode('A2');
+        runTime.addCode('01');
+        runTime.addCode('AC');
+        runTime.addCode(firstByte);
+        runTime.addCode(secondByte);
+        runTime.addCode('FF');
+    }else if (isLetter(childNode.name)) {//print id DONE
+        putMessage('Print: id');
+        var val = astNode.children[0];
+        var checkScope = findSymbolScope(varScope);//get current scope from symbol table
+        var valSymbolEntry = lookUpNode(val,checkScope);//Get the symbol table entry for id
+        var tempVal = staticTableLookUp(val.name,valSymbolEntry.scope);//get the static table entry's temp val
+        runTime.addCode('AC');
+        runTime.addCode(tempVal.temp);
+        runTime.addCode('XX');
+
+        var type = valSymbolEntry.type;
+        if(type =='Int' || type == 'Boolean'){
+            runTime.addCode('A2');
+            runTime.addCode('01');
+        }else{
+            runTime.addCode('A2');
+            runTime.addCode('02');
+        }//eo if else
+        runTime.addCode('FF');
+    }else if (childNode.name=='True'){//DONE
+        putMessage('Print: boolean true',1);
+        runTime.addCode('A0');
+        runTime.addCode('01');
+        runTime.addCode('A2');
+        runTime.addCode('01');
+        runTime.addCode('FF');
+    }else if (childNode.name=='False'){//DONE
+        putMessage('Print: boolean false',1);
+        runTime.addCode('A0');
+        runTime.addCode('00');
+        runTime.addCode('A2');
+        runTime.addCode('01');
+        runTime.addCode('FF');
+    }//eo if else
+};//eo generatePrint
+function addCodeAtIndex(code,index){
     if((index + 1) <= runTime.heapPointer){//
         runTime.env[index] = code;
     }else{
-        var errorMessage = "Error: Stack overflow at: " + decimalToHex(runTime.programCounter + 1) + " when inserting code " + code +" to index "+index;
+        var errorMessage = 'Error: Stack overflow at: ' + decimalToHex(runTime.programCounter + 1) + ' when inserting code ' + code +' to index '+index;
         putMessage(errorMessage);
     }//eo if else
-}//eo setCodeAtIndex
+}//eo addCodeAtIndex
+
+function writeStringToMemory(asciiString){
+    runTime.writeToHeap('00');//always write 00 after a string to divide them.
+    //loop over string backwards. Add at heapPointer. Deciment heapPointer.
+    for(var ct = asciiString.length; ct>0; ct--){
+        var currChar = asciiString.charCodeAt(ct-1);
+        var hex = currChar.toString(16);
+        runTime.writeToHeap(hex.toUpperCase());
+    }//eo for
+}//eo writeStringToMemory

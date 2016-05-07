@@ -1,13 +1,18 @@
 function runEnv(){
 	this.length =256;
 	this.programCounter=0;
-	this.heapPointer=255;
+	this.heapPointer=256;
 	this.env=[];
 	//add "code" to "env"
 	this.addCode = function(opCode){
 		this.env[this.programCounter]=opCode;
 		this.programCounter++;
 	};//eo addCode
+	this.writeToHeap = function(string){
+		this.heapPointer--;
+		this.env[this.heapPointer]=string;
+		
+	}
 	//find a temp location
 	this.getTemp = function(temp){
 
