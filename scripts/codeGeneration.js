@@ -339,6 +339,8 @@ function getAddress(astNode,targetTemp){
         runTime.addCode("8D");
         runTime.addCode(targetTemp);
         runTime.addCode("XX");
+    }else if(astNode.name=='=='||astNode.name=='!='){
+        generateBooleanExpr(astNode);
     }else{
         putMessage('Error: that is not supported by the 90\'s',0);
         codeGenErrors++;
