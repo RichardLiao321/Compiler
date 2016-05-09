@@ -336,7 +336,7 @@
 				stToken=stToken+input.charAt(pos-1);
 				tokens.push(new token('String',stToken,line));
 				tokens.push(new token('Quote','"',line));
-				stToken="";
+				stToken="";//EMPTY THE STRING SO IT DOESN'T ADD ANY PREVIOUS STRINGS
 				break;
 			case 44:
 			ct=pos+1;

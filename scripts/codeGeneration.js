@@ -24,10 +24,8 @@ function addStaticEntry(temp,variable,scope,offset,address){
             putMessage('Temp: '+temp+' Var: '+variable + ' scope: '+scope +' offset: '+offset+' address: '+address,1);
         }
     };
-    //index entries on varName and scope combo.
     staticTable[temp]=newStatic;
-    //newStatic.toString();
-    //staticTable.push(newStatic);
+    return newStatic;
 };//eo addSymbolEntry
 //print static table
 function staticTabletoString(){
@@ -40,13 +38,17 @@ function staticTabletoString(){
 //Add a new entry to the jump table
 function addJumpEntry(temp,dist){
     var newJump = {
+        temp:temp,
         dist:dist,
         toString:function(){
             putMessage('Temp: '+temp+' dist: '+variable,1);
+        },
+        setDist:function(distance){
+            this.dist=distance;
         }
     };
-    //jumpTable[temp]=newJump;
-    jumpTable.push(newJump);
+    jumpTable[temp]=newJump;
+    //jumpTable.push(newJump);
 };//eo addJumpEntry
 
 function generateCode(astRoot){
@@ -60,6 +62,13 @@ function generateCode(astRoot){
     jumpTable={};
     varScope = -1;
 
+    //temp,variable,scope,offset,address
+    //ADD two temp addresses for bool expr
+    varCt++;
+    var tempLeft = addStaticEntry('T'+varCt,'left',undefined,varCt,undefined);//add two temp addresses for calculations
+    varCt++;
+    var tempRight = addStaticEntry('T'+varCt,'right',undefined,varCt,undefined);//add two temp addresses for calculations
+    
     function traverseAST(astNode){
         if(astNode.name=='block'){
         	generateBlock(astNode);
@@ -123,14 +132,14 @@ function generateASTNode(astNode){
                 if(leftType=='Int'&&!isLetter(right.name)){
                     //HOW TO EVALUATE 1+2+3+b????
                     var tempVal = staticTableLookUp(left.name,leftSymbolEntry.scope);
-                    if(right.name!='+'){
+                    if(right.name!='+'){//JUST SINGLE DIGIT
                         var val = parseInt(right);
                         runTime.addCode('A9');
                         runTime.addCode('0'+right.name);
                         runTime.addCode('8D');
                         runTime.addCode(tempVal.temp);
                         runTime.addCode('XX');
-                    }else if(right.name=='+'){
+                    }else if(right.name=='+'){//THERE IS AN INT EXPRESSION
                         var results = generateIntExpr(astNode);
                         var intExprTotal = results[0];
                         var id = results[1];
@@ -142,6 +151,7 @@ function generateASTNode(astNode){
                         runTime.addCode('XX');
                         // IF THERE IS AN ID, PERFORM ADD WITH CARRIES
                         if(id != undefined){// id at the end of int expr
+                            //HELP MY CAPS LOCK IS STUCK.
                             rightSymbolEntry = lookUpNode(id,checkScope);
                             var leftTemp  = staticTableLookUp(left.name,leftSymbolEntry.scope).temp
                             //find the temp value for id and scope
@@ -211,16 +221,130 @@ function generateASTNode(astNode){
             generatePrint(astNode);
             break;
         case 'if':
-        jumpCt++;
+            jumpCt++;
+            addJumpEntry('J'+jumpCt,undefined);
+            var jumpEntry = jumpTableLookUp('J'+jumpCt);
+            var currentLocation = runTime.programCounter;
+
+            generateBooleanExpr(astNode.children[0]);
+            runTime.addCode('D0');
+            runTime.addCode(jumpEntry.temp);
+            generateBlock(astNode.children[1]);
+
+            var endLocation = runTime.programCounter;
+            var dist = endLocation-currentLocation;
+            jumpEntry.setDist(dist);
             break;
         case 'while':
-        jumpCt++;
+            jumpCt++;
+            var startLocation = runTime.programCounter;
+            //console.log(startLocation);
+            addJumpEntry('J'+jumpCt,dist);
+            var jumpEntry = jumpTableLookUp('J'+jumpCt);
+            generateBooleanExpr(astNode.children[0]);
+            runTime.addCode('D0');
+            runTime.addCode(jumpEntry.temp);
+            generateBlock(astNode.children[1]);
+            var dist =  (runTime.programCounter-1)-startLocation ;
+            //console.log(dist);
+            jumpEntry.setDist(dist);
+            //Add the return
+            runTime.addCode("A2");
+            runTime.addCode("01");
+            runTime.addCode("EC");
+            runTime.addCode("FF");
+            runTime.addCode("00");
+            runTime.addCode("D0");
+            var end = (256 + startLocation) - runTime.programCounter - 1;
+            var endHex = end.toString(16).toUpperCase();
+            runTime.addCode(endHex);
+
             break;
         default:
             putMessage('Unknown node type: '+astNode.name,0);
             return;
     }//eo switch
 }//eo generateASTNode
+
+//if astNode.name == '!=' or == we know bool expr
+//store left in t0, and right in t1, t2 is our current z flag
+//load t0 into x register
+//ec t1
+//if z flag set A9 01 8D t2 if true       A9 01 8D t2 if false
+
+//Here lies Richard's mind. He lost it here, but can't find it because he needs it to find it
+//generate code for a boolean expr
+function generateBooleanExpr(astNode){
+    var left = astNode.children[0];
+    var right = astNode.children[1];
+    var leftAddress = getAddress(left,'T0');
+    var rightAddress = getAddress(right,'T1');
+    //var resultAddress;
+    //code that compares left and right addresses.
+    runTime.addCode('AE');
+    runTime.addCode('T0');
+    runTime.addCode('XX');
+    runTime.addCode('EC');
+    runTime.addCode('T1');
+    runTime.addCode('XX');
+    //runTime.addCode(rightAddress);
+    runTime.addCode('A9');
+    runTime.addCode('00');
+    runTime.addCode('D0');
+    runTime.addCode('02');
+    runTime.addCode('A9');
+    runTime.addCode('01');
+    if(astNode.name== '!='){
+        runTime.addCode('A2');
+        runTime.addCode('00');
+        runTime.addCode('8D');
+        runTime.addCode('T0');
+        runTime.addCode('XX');
+        runTime.addCode('EC');
+        runTime.addCode('T0');
+        runTime.addCode('XX');
+    }
+    //store results in left address
+
+    //return left address
+    //return resultAddress;
+}//eo generateBooleanExpr
+
+function getAddress(astNode,targetTemp){
+    if(astNode.name == "True"){
+        runTime.addCode("A9");
+        runTime.addCode("01");
+        runTime.addCode("8D");
+        runTime.addCode(targetTemp);
+        runTime.addCode("XX");
+    }else if(astNode.name == "False"){
+        runTime.addCode("A9");
+        runTime.addCode("00");
+        runTime.addCode("8D");
+        runTime.addCode(targetTemp);
+        runTime.addCode("XX");
+    }else if(isInt(astNode.name)){
+        runTime.addCode("A9");
+        runTime.addCode("0" + astNode.name);
+        runTime.addCode("8D");
+        runTime.addCode(targetTemp);
+        runTime.addCode("XX");
+    }else if(isLetter(astNode.name)){
+        var checkScope = findSymbolScope(varScope);
+        var leftSymbolEntry = lookUpNode(astNode,checkScope); 
+        var tempVal = staticTableLookUp(astNode.name,leftSymbolEntry.scope).temp;
+        runTime.addCode("AE");
+        runTime.addCode(tempVal);
+        runTime.addCode("XX");
+        runTime.addCode("8D");
+        runTime.addCode(targetTemp);
+        runTime.addCode("XX");
+    }else{
+        putMessage('Error: that is not supported by the 90\'s',0);
+        codeGenErrors++;
+    }//eo if else
+    return targetTemp;
+}//eo getAddress
 
 //look up a var at a scope, return the entry
 function staticTableLookUp(varName,vScope){
@@ -236,6 +360,19 @@ function staticTableLookUp(varName,vScope){
     return ret;
 }//eo staticTableLookUp
 
+//look up a jump name
+function jumpTableLookUp(jumpName){
+    var ret;
+    //ret = staticTable[varName+vScope];
+    for(var j = 0;j<Object.keys(jumpTable).length;j++){
+        //console.log(jumpTable['J'+j].temp);
+        if(jumpTable['J'+j].temp == jumpName){
+            ret = jumpTable['J'+j];
+        }//eo if
+    }//eo for
+    return ret;
+}//eo jumpTableLookUp
+
 //after all stuff has been read in, replace all temp addresses with proper addresses
 function backPatch(){
     putMessage('Backpatching code.....',1);
@@ -246,7 +383,7 @@ function backPatch(){
         currByte = runTime.env[index];
 
         // All temp variables start with T
-        if (currByte[0]==='T'){
+        if (currByte[0]=='T'){
             //var substringIndex = parseInt(currByte.substring(1), 10);
             var staticTableEntry = staticTable[currByte];
             var newIndex = staticArea + parseInt(staticTableEntry.offset);
@@ -254,22 +391,20 @@ function backPatch(){
 
             if (newIndex < runTime.heapPointer) {
                 //if newIndex does not have a collision with heap starting point
-                putMessage('Resolved entry of ' + currByte + ' to: ' + hexAddress,1);
+                putMessage('changed ' + currByte + ' to: ' + hexAddress,1);
                 staticTableEntry.setAddress(hexAddress);//This does not work for some reason.
                 this.addCodeAtIndex(hexAddress, index);
                 this.addCodeAtIndex('00', index + 1);
             }else{
-                var errorMessage = 'Error: static area conflicting with heap at ' + decimalToHex(runTime.heapPointer) + '. ' + tempTableEntry.temp + ' was resolved to address ' + hexAddress;
+                var errorMessage = 'Error: static area conflicting with heap at ' + decimalToHex(runTime.heapPointer);
                 putMessage(errorMessage,0);
                 codeGenErrors++;
             }//eo if else
-        }else if (currByte[0]==='J'){
-            var substringIndex = parseInt(currByte.substring(1), 10);
-            var jumpTableEntry = jumpTable[substringIndex];
-
+        }else if(currByte[0]=='J'){
+            var jumpTableEntry = jumpTable[currByte];
             var distanceToJump = decimalToHex(jumpTableEntry.dist);
 
-            putMessage('Resolving jump entry of ' + currByte + ' to: ' + distanceToJump,1);
+            putMessage('changed ' + currByte + ' to: ' + distanceToJump,1);
 
             this.addCodeAtIndex(distanceToJump, index);
         }else{
@@ -281,49 +416,37 @@ function generatePrint(astNode){
     var childNode = astNode.children[0];
     //console.log(childNode.name);
     // Integer addition
-    if (isInt(childNode.name)) {//print digit DONE
+    if (isInt(childNode.name)){//print digit DONE
         putMessage('Print: digit',1);
         runTime.addCode('A0');
         runTime.addCode('0' + childNode.name);
         runTime.addCode('A2');
         runTime.addCode('01');
         runTime.addCode('FF');
-    }else if(childNode.name =='+') {
-        putMessage('Print: Int operation',1);
-        var addressesToAdd = [];
-        addressesToAdd = runTime.insertAddLocations(childNode, addressesToAdd);
-        var addressOfSum = runTime.insertAddCode(addressesToAdd);
-        var firstByte = addressOfSum.split(' ')[0];
-        var secondByte = addressOfSum.split(' ')[1];
-
-        runTime.addCode('AC');
-        runTime.addCode(firstByte);
-        runTime.addCode(secondByte);
-        runTime.addCode('A2');
-        runTime.addCode('01');
-        runTime.addCode('FF');
+    }else if(childNode.name =='+'){
+        //Might need to make a temp left hand address.
     }else if(childNode.name.indexOf('\"')!=-1) {//String DONE
         var strippedString = childNode.name.substring(1,childNode.name.length-1);
+
         writeStringToMemory(strippedString);
         runTime.addCode('A0');
         runTime.addCode(decimalToHex(runTime.heapPointer));
         runTime.addCode('A2');
         runTime.addCode('02');
         runTime.addCode('FF');
-    }else if (childNode.name=='!='||childNode.name=='==') {
+    }else if(childNode.name=='!='||childNode.name=='==') {
         putMesssage('Print: comparison');
-
         var address = runTime.generateBooleanExpr(childNode);
-
         var firstByte = address.split(' ')[0];
         var secondByte = address.split(' ')[1];
+
         runTime.addCode('A2');
         runTime.addCode('01');
         runTime.addCode('AC');
         runTime.addCode(firstByte);
         runTime.addCode(secondByte);
         runTime.addCode('FF');
-    }else if (isLetter(childNode.name)) {//print id DONE
+    }else if(isLetter(childNode.name)) {//print id DONE
         putMessage('Print: id');
         var val = astNode.children[0];
         var checkScope = findSymbolScope(varScope);//get current scope from symbol table
@@ -333,22 +456,21 @@ function generatePrint(astNode){
         runTime.addCode(tempVal.temp);
         runTime.addCode('XX');
         var type = valSymbolEntry.type;
+        runTime.addCode('A2');
         if(type =='Int' || type == 'Boolean'){
-            runTime.addCode('A2');
             runTime.addCode('01');
         }else{
-            runTime.addCode('A2');
             runTime.addCode('02');
         }//eo if else
         runTime.addCode('FF');
-    }else if (childNode.name=='True'){//DONE
+    }else if(childNode.name=='True'){//DONE
         putMessage('Print: boolean true',1);
         runTime.addCode('A0');
         runTime.addCode('01');
         runTime.addCode('A2');
         runTime.addCode('01');
         runTime.addCode('FF');
-    }else if (childNode.name=='False'){//DONE
+    }else if(childNode.name=='False'){//DONE
         putMessage('Print: boolean false',1);
         runTime.addCode('A0');
         runTime.addCode('00');
@@ -357,6 +479,7 @@ function generatePrint(astNode){
         runTime.addCode('FF');
     }//eo if else
 };//eo generatePrint
+
 function addCodeAtIndex(code,index){
     if((index + 1) <= runTime.heapPointer){//
         runTime.env[index] = code;

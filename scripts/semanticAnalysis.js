@@ -204,7 +204,7 @@ function analyzeBoolExpr(astNode){
 		putMessage("Error: Type mismatch on line "+ astNode.line+" Got "+leftEntry+" vs "+rightEntry,0);
 		semErrors++;
 		isValid=false	
-	}
+	}//eo if else
 	return isValid;
 }//eo analyzeBoolExpr
 
