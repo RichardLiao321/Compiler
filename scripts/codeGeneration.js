@@ -1,7 +1,7 @@
 /*
 TODO
-How to evaluate int expr like 1+1+1+3?
-how to do assignment? look up from static table?
+WHILE LOOP IS BROKEN: TRY int a a=1 while (a!=3) {print(a) a=1+1} a never crosses 2
+
 */
 var codeGenErrors=0;
 var codeGenWarnings=0;
@@ -304,8 +304,6 @@ function generateBooleanExpr(astNode){
         runTime.addCode('T0');
         runTime.addCode('XX');
     }
-    //store results in left address
-
     //return left address
     //return resultAddress;
 }//eo generateBooleanExpr

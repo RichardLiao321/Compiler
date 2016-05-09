@@ -48,15 +48,15 @@
 		  <li class=""><a href="javascript:;" onclick="testPrograms(6)"><img class="pull-left" style="margin-top: -3px" src="img/test/new.gif">Incorrect Program 1</a></li>
 		</ul>
 	</div>
-    <div style="float:left">
+    <div style="float:left;">
         <textarea id="taSourceCode" rows="18"></textarea>
         <br>
 		<div>
         <button id="btnCompile" onclick="btnCompile_click();"><img src="img/test/hot.gif">Compile<img src="img/test/hot.gif"></button>
 		</div>
     </div>
-	<div>
-		<textarea style="width:500px" id="taOutput" rows="18"></textarea>
+	<div style="">
+		<textarea style="width:500px;" id="taOutput" rows="18"></textarea>
 		
 		<form id='verbose'>
 			<input id='verboseOn' name="verboseMode" type="radio" checked="checked" >Verbose On<br>
@@ -85,6 +85,7 @@
 	</center>
     <!-- Client-side code down here, per the YSlow advice. 
     // (http://developer.yahoo.com/performance/rules.html#js_bottom) -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
     <script type="text/javascript" src="scripts/utils.js"></script>	
     <script type="text/javascript" src="scripts/lexer.js"></script>
 	<script type="text/javascript" src="scripts/parse.js"></script>
@@ -96,6 +97,16 @@
 	<script src="treant-js-master/vendor/raphael.js"></script>
     <script src="treant-js-master/Treant.js"></script>
     <script type="text/javascript">
+    function toggleBananaOn(){
+    	$(function(){
+    		$("#taSourceCode").addClass("ta-bananaOn");
+    		$("#taSourceCode").removeClass("ta-bananaOff");
+    	});
+    	setTimeout(function(){$(function(){
+    		$("#taSourceCode").removeClass("ta-bananaOn");
+    		$("#taSourceCode").addClass("ta-bananaOff");
+    	});},2000);
+    }//eo toggleBanana
     // Global variables
     var tokens = [];
     var tokenIndex = 0;
@@ -140,7 +151,7 @@
 			putMessage('Warning No EOF character($) found...',1);
 			source=source+'$';
 			lexWarnings++;
-		}else 
+		}else
 
 		//replace all $ with $~. ~ is not used by our language.
         var newSourceRep = ""
@@ -185,6 +196,8 @@
 				generateCode(AST.root);
 				runTime.toString();
 				staticTabletoString();
+				toggleBananaOn();
+				//setTimeout(toggleBananaOff(),2000);
 			}else{
 				return;
 			}
