@@ -143,7 +143,14 @@ function generateASTNode(astNode){
                         var results = generateIntExpr(astNode);
                         var intExprTotal = results[0];
                         var id = results[1];
-                        //ADD THE TOTAL TO CODE
+                        //OLD VALUE INTO T0XX
+                        runTime.addCode('AD');
+                        runTime.addCode(tempVal.temp);
+                        runTime.addCode('XX');
+                        runTime.addCode('8D');
+                        runTime.addCode('T0');
+                        runTime.addCode('XX');
+                        //CALCULATED TOTAL INTO VAR 
                         runTime.addCode('A9');
                         runTime.addCode(decimalToHex(intExprTotal));
                         runTime.addCode('8D');
@@ -153,21 +160,32 @@ function generateASTNode(astNode){
                         if(id != undefined){// id at the end of int expr
                             //HELP MY CAPS LOCK IS STUCK.
                             rightSymbolEntry = lookUpNode(id,checkScope);
-                            var leftTemp  = staticTableLookUp(left.name,leftSymbolEntry.scope).temp
                             //find the temp value for id and scope
                             var rightTemp = staticTableLookUp(id.name,rightSymbolEntry.scope).temp;
-                            //load accumulator with left's stuff
-                            runTime.addCode('AD');
-                            runTime.addCode(leftTemp);
-                            runTime.addCode('XX');
-                            //SUM WITH RIGHT'S ADDRESS
-                            runTime.addCode('6D');
-                            runTime.addCode(rightTemp);
-                            runTime.addCode('XX');
-                            //store at left's address
-                            runTime.addCode('8D');
-                            runTime.addCode(leftTemp);
-                            runTime.addCode('XX');
+                            if(tempVal.temp==rightTemp){
+                                runTime.addCode('AD');
+                                runTime.addCode(tempVal.temp);
+                                runTime.addCode('XX');
+                                runTime.addCode('6D');
+                                runTime.addCode('T0');
+                                runTime.addCode('XX');
+                                runTime.addCode('8D');
+                                runTime.addCode(tempVal.temp);
+                                runTime.addCode('XX');
+                            }else{
+                                //load accumulator with left's stuff
+                                runTime.addCode('AD');
+                                runTime.addCode(tempVal.temp);
+                                runTime.addCode('XX');
+                                //SUM WITH RIGHT'S ADDRESS
+                                runTime.addCode('6D');
+                                runTime.addCode(rightTemp);
+                                runTime.addCode('XX');
+                                //store at left's address
+                                runTime.addCode('8D');
+                                runTime.addCode(tempVal.temp);
+                                runTime.addCode('XX');
+                            }
                         }//eo if else
                     }//eo if else
                 }else if(leftType =='String'&&!isLetter(right.name)){
@@ -225,10 +243,10 @@ function generateASTNode(astNode){
             addJumpEntry('J'+jumpCt,undefined);
             var jumpEntry = jumpTableLookUp('J'+jumpCt);
             var currentLocation = runTime.programCounter;
-
-            generateBooleanExpr(astNode.children[0]);
             runTime.addCode('D0');
             runTime.addCode(jumpEntry.temp);
+            generateBooleanExpr(astNode.children[0]);
+
             generateBlock(astNode.children[1]);
 
             var endLocation = runTime.programCounter;
@@ -258,7 +276,6 @@ function generateASTNode(astNode){
             var end = (256 + startLocation) - runTime.programCounter - 1;
             var endHex = end.toString(16).toUpperCase();
             runTime.addCode(endHex);
-
             break;
         default:
             putMessage('Unknown node type: '+astNode.name,0);
@@ -277,8 +294,8 @@ function generateASTNode(astNode){
 function generateBooleanExpr(astNode){
     var left = astNode.children[0];
     var right = astNode.children[1];
-    var leftAddress = getAddress(left,'T0');
-    var rightAddress = getAddress(right,'T1');
+    getAddress(left,'T0');
+    getAddress(right,'T1');
     //var resultAddress;
     //code that compares left and right addresses.
     runTime.addCode('AE');
