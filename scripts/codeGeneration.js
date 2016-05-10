@@ -292,12 +292,34 @@ function generateASTNode(astNode){
 
 //Here lies Richard's mind. He lost it here, but can't find it because he needs it to find it
 //generate code for a boolean expr
-function generateBooleanExpr(astNode){
+function generateBooleanExpr(astNode,target){
     var left = astNode.children[0];
     var right = astNode.children[1];
-    getAddress(left,'T0');
-    getAddress(right,'T1');
+    var ls = getAddress(left,'T0');
+    var rs = getAddress(right,'T1');
     //var resultAddress;
+    //Im lazy so this is how I evaluate strings. It's messy, but :), only issue is need a way to evaluate id's
+    if(target!=undefined){
+        if(ls=='string'||rs=='string '){
+            var leftString = left.name;
+            var rightString= right.name;
+            if(1==1){
+                if(left.name==right.name){
+                    runTime.addCode("A9");
+                    runTime.addCode("01");
+                    runTime.addCode("8D");
+                    runTime.addCode(target);
+                    runTime.addCode("XX");
+                }else if(left.name!=right.name){
+                    runTime.addCode("A9");
+                    runTime.addCode("00");
+                    runTime.addCode("8D");
+                    runTime.addCode(target);
+                    runTime.addCode("XX");
+                }//eo if else
+            }
+        }//eo if
+    }//eo if
     //code that compares left and right addresses.
     runTime.addCode('AE');
     runTime.addCode('T0');
@@ -357,6 +379,8 @@ function getAddress(astNode,targetTemp){
         runTime.addCode("XX");
     }else if(astNode.name=='=='||astNode.name=='!='){
         generateBooleanExpr(astNode);
+    }else if(astNode.name.indexOf('\"')!=-1){//string 
+        targetTemp='string';
     }else{
         putMessage('Error: that is not supported by the 90\'s',0);
         codeGenErrors++;
@@ -442,6 +466,55 @@ function generatePrint(astNode){
         runTime.addCode('01');
         runTime.addCode('FF');
     }else if(childNode.name =='+'){
+        var results = generateIntExpr(childNode);
+        var checkScope = findSymbolScope(varScope);
+        var intExprTotal = results[0];
+        var id = results[1];
+        //CALCULATED TOTAL INTO VAR 
+        runTime.addCode('A9');
+        runTime.addCode(decimalToHex(intExprTotal));
+        runTime.addCode('8D');
+        runTime.addCode('T0');
+        runTime.addCode('XX');
+        // IF THERE IS AN ID, PERFORM ADD WITH CARRIES
+        if(id != undefined){// id at the end of int expr
+            //HELP MY CAPS LOCK IS STUCK.
+            rightSymbolEntry = lookUpNode(id,checkScope);
+            //find the temp value for id and scope
+            var rightTemp = staticTableLookUp(id.name,rightSymbolEntry.scope).temp;
+            if(rightTemp=='T0'){
+                runTime.addCode('AD');
+                runTime.addCode('T0');
+                runTime.addCode('XX');
+                runTime.addCode('6D');
+                runTime.addCode('T0');
+                runTime.addCode('XX');
+                runTime.addCode('8D');
+                runTime.addCode('T0');
+                runTime.addCode('XX');
+            }else{
+                //load accumulator with left's stuff
+                runTime.addCode('AD');
+                runTime.addCode('T0');
+                runTime.addCode('XX');
+                //SUM WITH RIGHT'S ADDRESS
+                runTime.addCode('6D');
+                runTime.addCode(rightTemp);
+                runTime.addCode('XX');
+                //store at left's address
+                runTime.addCode('8D');
+                runTime.addCode('T0');
+                runTime.addCode('XX');
+            }
+        }//eo if else
+        runTime.addCode('A2');
+        runTime.addCode('01');
+        runTime.addCode('AC');
+        runTime.addCode('T0');
+        runTime.addCode('XX');
+        //runTime.addCode('T1');
+        //runTime.addCode('XX');
+        runTime.addCode('FF');
         //Might need to make a temp left hand address.
     }else if(childNode.name.indexOf('\"')!=-1) {//String DONE
         var strippedString = childNode.name.substring(1,childNode.name.length-1);
@@ -453,16 +526,18 @@ function generatePrint(astNode){
         runTime.addCode('02');
         runTime.addCode('FF');
     }else if(childNode.name=='!='||childNode.name=='==') {
-        putMesssage('Print: comparison');
-        var address = runTime.generateBooleanExpr(childNode);
-        var firstByte = address.split(' ')[0];
-        var secondByte = address.split(' ')[1];
+        var address = generateBooleanExpr(childNode);
+        if(address==undefined){
+            address='T0';
+        }
 
         runTime.addCode('A2');
         runTime.addCode('01');
         runTime.addCode('AC');
-        runTime.addCode(firstByte);
-        runTime.addCode(secondByte);
+        runTime.addCode(address);
+        runTime.addCode('XX');
+        //runTime.addCode('T1');
+        //runTime.addCode('XX');
         runTime.addCode('FF');
     }else if(isLetter(childNode.name)) {//print id DONE
         putMessage('Print: id');
@@ -527,19 +602,22 @@ function generateIntExpr(astNode){
         var plusLeft = plusNode.children[0];
         var plusRight = plusNode.children[1];
         //console.log(plusLeft.name + " and  "+plusRight.name );
-        if(isInt(plusLeft.name)){
-            total+=parseInt(plusLeft.name);
-        }
-        if(isInt(plusRight.name)){
-            total+=parseInt(plusRight.name);
-        }else if(isLetter(plusRight.name)){
-            id=plusRight;
-        }
-        if(plusRight.name=='+'){
-            traverseIntTree(plusRight);
+        if(plusNode.children.length>0){
+            if(isInt(plusLeft.name)){
+                total+=parseInt(plusLeft.name);
+            }
+            if(isInt(plusRight.name)){
+                total+=parseInt(plusRight.name);
+            }else if(isLetter(plusRight.name)){
+                id=plusRight;
+            }
+            if(plusRight.name=='+'){
+                traverseIntTree(plusRight);
+            }
         }
     }//eo getTotal
     traverseIntTree(astNode);
     return [total,id];
 }//eo generateIntExpr
 
+//PRINT BOOL EXPR WORKS ONLY IF THE NESTED STATEMENT IS ON THE RIGHT.
