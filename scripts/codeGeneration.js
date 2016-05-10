@@ -243,9 +243,10 @@ function generateASTNode(astNode){
             addJumpEntry('J'+jumpCt,undefined);
             var jumpEntry = jumpTableLookUp('J'+jumpCt);
             var currentLocation = runTime.programCounter;
+            generateBooleanExpr(astNode.children[0]);
             runTime.addCode('D0');
             runTime.addCode(jumpEntry.temp);
-            generateBooleanExpr(astNode.children[0]);
+            
 
             generateBlock(astNode.children[1]);
 
